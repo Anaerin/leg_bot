@@ -13,12 +13,17 @@ var channel = require('./lib/channel.js');
 
 var config = require('./config.js').irc;
 
+var disconnectionTimer;
+var disconnectionValue = 10 * 60 * 1000;
+
 //We setup the options object and import the oauth token.
 var token = require('./secrets.js').twitchToken;
 var options = {
 	'userName': config.userName,
 	'realName': config.userName,
-	'password': token,
+    'password': token,
+    'floodProtection': true,
+    'encoding': 'UTF-8',
 };
 
 var client = module.exports.client = new irc.Client("irc.twitch.tv", config.userName, options);
@@ -43,13 +48,16 @@ var joinChannel = module.exports.joinChannel = function(channel){
 }
 
 client.on('disconnected', function(){
-	log.info("DISCONNECTED", arguments);
+    log.info("DISCONNECTED", arguments);
+    client.connect(10);
 });
 
 client.on('connect', function(){
 	//this is a dumb hack, but it keeps us working without having
-	//to rewrite the moderator code.
-	client.conn.write("CAP REQ :twitch.tv/membership\r\n");
+    //to rewrite the moderator code.
+    log.debug("Connected - sending CAP request");
+    client.conn.write("CAP REQ :twitch.tv/membership\r\n");
+    disconnectionTimer = setTimeout(disconnectionTimeout, disconnectionValue);
 });
 //We add a bunch of listeners to the IRC client that forward the events ot the appropriate Channel objects.
 client.on('message', function(user, channel, message){
@@ -87,9 +95,26 @@ client.on('+mode', parseMode);
 client.on('-mode', parseMode);
 
 client.on('ping', function(){
-	log.info("Got PING from twitch");
+    log.info("Got PING from twitch");
 });
 
 client.on('netError', function(e){
 	log.error('IRC lib netError:', e);
 });
+
+client.on('error', function (e) {
+    log.error('IRC Server error:', e);
+});
+
+client.on('raw', function (e) {
+    // log.debug('RAW:', e);
+    if (disconnectionTimer) {
+        clearTimeout(disconnectionTimer);
+    }
+    disconnectionTimer = setTimeout(disconnectionTimeout, disconnectionValue);
+})
+
+function disconnectionTimeout() {
+    log.info("Didn't receive anything from the server in the last 10 minutes. Timeout? Retry the connection");
+    client.connect(10);
+}

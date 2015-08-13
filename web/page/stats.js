@@ -6,7 +6,7 @@ var channels = {};
 
 models.Channel
 		.findAll({where: ["active"]})
-		.success(function(models){
+		.then(function(models){
 			models.forEach(function(model){
 				var name = model.name;
 				channels[name] = model;

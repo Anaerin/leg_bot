@@ -1,6 +1,6 @@
 module.exports = {
 	irc: {
-		userName: 'leg_bot',
+		userName: 'Ghost_of_Leg_Bot',
 	},
 
 	db: {

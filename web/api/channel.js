@@ -3,6 +3,8 @@
 var models = require('../../lib/models.js');
 var channelList = require('../../lib/channel.js').channels;
 
+var log = require('../../log.js');
+
 var express = require('express');
 var app = module.exports = new express.Router({mergeParams: true});
 
@@ -27,8 +29,8 @@ function dumpChannelInfo(req, res){
 
 	dump.name = channel.model.name;
 	dump.game = res.locals.game || channel.getGame() || "";
-
-	var queryParams = {
+    
+    var queryParams = {
 		include: models.Count,
 	}
 
@@ -36,7 +38,6 @@ function dumpChannelInfo(req, res){
 
 		dump.statistics = [];
 		dump.counts = {};
-
 		statistics.forEach(parseStat);
 
 		res.send(dump);
@@ -44,15 +45,13 @@ function dumpChannelInfo(req, res){
 
 	function parseStat(stat){
 		dump.statistics.push(stat.command);
-
 		dump.counts[stat.command] = 0;
-
-		stat.counts.forEach(parseCount.bind(null, stat));
+		stat.Counts.forEach(parseCount.bind(null, stat));
 	}
 
 	function parseCount(statistic, count){
 		if(count.game.toLowerCase() == dump.game.toLowerCase()){
-			dump.counts[statistic.command] = count.value;
+            dump.counts[statistic.command] = count.value;
 		}
 	}
 
@@ -76,17 +75,16 @@ app.get('/:channel/games', function(req, res){
 	}
 
 	channel.model.getStatistics(queryParams).then(function(statistics){
-
 		statistics.forEach(parseStat);
 		dump = Object.keys(games);
 		res.send(dump);
 	});
 
 	function parseStat(stat){
-		stat.counts.forEach(parseCount.bind(null, stat));
+        stat.Counts.forEach(parseCount.bind(null, stat));
 	}
 
-	function parseCount(statistic, count){
+    function parseCount(statistic, count){
 		games[count.game] = true;
 	}
 });
@@ -154,7 +152,7 @@ app.get('/:channel/counts', function(req, res){
 
 			var statGames = statDump.games = {};
 
-			stat.counts.forEach(function(count){
+			stat.Counts.forEach(function(count){
 				statGames[count.game] = count.value;
 			});
 		});
