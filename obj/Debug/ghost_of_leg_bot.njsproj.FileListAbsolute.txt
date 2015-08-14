@@ -1,0 +1,2 @@
+C:\Users\Robert\Documents\GitHub\leg_bot\obj\Debug\ghost_of_leg_bot.njsprojResolveAssemblyReference.cache
+C:\Users\Robert\Documents\GitHub\leg_bot\bin\Microsoft.NodejsTools.WebRole.dll
