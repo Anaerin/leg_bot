@@ -13,4 +13,4 @@ var options = {
 };
 
 w.add(Winston.transports.DailyRotateFile, options);
-w.add(Winston.transports.Console, { level: 'info', colorize: true, timestamp: true });
+w.add(Winston.transports.Console, { level: 'debug', colorize: true, timestamp: true });
