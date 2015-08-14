@@ -55,13 +55,23 @@ client.on('disconnected', function(){
     client.connect(10);
 });
 
+//Wait, client.on('disconnect') does nothing? Hook the underlying connection, then.
+client.conn.on('close', function (had_error) {
+    if (had_error) {
+        log.info("Connection closed, with error - reconnecting");
+    } else {
+        log.info("Connection closed, without error - reconnecting");
+    }
+    client.connect(10);
+});
+
 client.on('connect', function(){
 	//this is a dumb hack, but it keeps us working without having
     //to rewrite the moderator code.
     log.debug("Connected - sending CAP request");
     client.conn.write("CAP REQ :twitch.tv/membership\r\n");
     
-    //Keep the connection alive...
+    //Keep the connection alive - send an ACK every 10 seconds or so...
     client.conn.setKeepAlive(true, 10000);
     //And watch to see if we timeout anyway
     disconnectionTimer = setTimeout(disconnectionTimeout, disconnectionValue);
@@ -111,16 +121,6 @@ client.on('netError', function(e){
 
 client.on('error', function (e) {
     log.error('IRC Server error:', e);
-});
-
-//Wait, client.on('disconnect') does nothing? Hook the underlying connection, then.
-client.conn.on('close', function (had_error) {
-    if (had_error) {
-        log.info("Connection closed, with error");
-    } else {
-        log.info("Connection closed, without error");
-    }
-    client.connect(10);
 });
 
 client.on('raw', function (e) {
