@@ -1,7 +1,7 @@
 module.exports = {
 	irc: {
-		userName: 'Ghost_of_Leg_Bot',
-        //userName: 'iamhumannotabot', //Strictly for testing porpoises.
+		//userName: 'Ghost_of_Leg_Bot',
+        userName: 'iamhumannotabot', //Strictly for testing porpoises.
 	},
 
 	db: {
