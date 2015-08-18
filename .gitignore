@@ -10,3 +10,4 @@ db_backups
 .ntvs_analysis.dat
 *.suo
 legbot.sqlite
+legbot.sqlite
