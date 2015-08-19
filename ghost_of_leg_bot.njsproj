@@ -20,6 +20,7 @@
     <Compile Include="client.js" />
     <Compile Include="config.js" />
     <Compile Include="legbot.js" />
+    <Compile Include="lib\antispam.js" />
     <Compile Include="lib\commands\antispam.js" />
     <Compile Include="log.js" />
     <Compile Include="otherchannels.js" />

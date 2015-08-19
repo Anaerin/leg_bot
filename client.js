@@ -8,6 +8,7 @@
 
 var irc = require('irc');
 var log = require('./log.js');
+var Models = require('./lib/models.js');
 
 var channel = require('./lib/channel.js');
 
@@ -70,7 +71,6 @@ client.on('connect', function(){
     //to rewrite the moderator code.
     log.debug("Connected - sending CAP request");
     client.conn.write("CAP REQ :twitch.tv/membership\r\n");
-    
     //Keep the connection alive - send an ACK every 10 seconds or so...
     client.conn.setKeepAlive(true, 10000);
     //And watch to see if we timeout anyway
