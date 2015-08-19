@@ -16,6 +16,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Content Include="AntiSpamRules.json" />
     <Content Include="README.md" />
     <Compile Include="client.js" />
     <Compile Include="config.js" />

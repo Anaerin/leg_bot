@@ -19,6 +19,7 @@ var config = require('./config.js').irc;
 var disconnectionTimer;
 var disconnectionValue = 10 * 60 * 1000;
 
+
 //We setup the options object and import the oauth token.
 var token = require('./secrets.js').twitchToken;
 var options = {
@@ -30,6 +31,8 @@ var options = {
 };
 
 var client = module.exports.client = new irc.Client("irc.twitch.tv", config.userName, options);
+
+client.quitting = false;
 
 //We store Channel objects that we pass messages to
 var channels = {};
@@ -58,12 +61,18 @@ client.on('disconnected', function(){
 
 //Wait, client.on('disconnect') does nothing? Hook the underlying connection, then.
 client.conn.on('close', function (had_error) {
-    if (had_error) {
-        log.info("Connection closed, with error - reconnecting");
+    if (!client.quitting) {
+        if (had_error) {
+            log.info("Connection closed, with error - reconnecting");
+        } else {
+            log.info("Connection closed, without error - reconnecting");
+        }
+        client.connect(10);
     } else {
-        log.info("Connection closed, without error - reconnecting");
+        log.info("Connection closed while quitting");
+        log.info("Bailing...");
+        process.exit();
     }
-    client.connect(10);
 });
 
 client.on('connect', function(){
