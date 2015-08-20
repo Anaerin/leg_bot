@@ -80,9 +80,17 @@ client.on('connect', function(){
     //to rewrite the moderator code.
     log.debug("Connected - sending CAP request");
     client.conn.write("CAP REQ :twitch.tv/membership\r\n");
+<<<<<<< HEAD
     //Keep the connection alive - send an ACK every 10 seconds or so...
     client.conn.setKeepAlive(true, 10000);
     //And watch to see if we timeout anyway
+=======
+    
+    //Keep the connection alive...
+    client.conn.setKeepAlive(true, 10000);
+    
+
+>>>>>>> master
     disconnectionTimer = setTimeout(disconnectionTimeout, disconnectionValue);
 });
 //We add a bunch of listeners to the IRC client that forward the events ot the appropriate Channel objects.
