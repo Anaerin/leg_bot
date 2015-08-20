@@ -6,3 +6,8 @@ logs
 misc.log
 error.log*
 db_backups
+.vs
+.ntvs_analysis.dat
+*.suo
+legbot.sqlite
+legbot.sqlite

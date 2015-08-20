@@ -8,13 +8,17 @@
 
 var irc = require('irc');
 var log = require('./log.js');
+var Models = require('./lib/models.js');
 
 var channel = require('./lib/channel.js');
 
 var config = require('./config.js').irc;
 
+//Set up disconnection timer for inactivity
+//Twitch sends a PING every 5 minutes. If 10 minutes pass with no activity, we've been silently DC'd
 var disconnectionTimer;
 var disconnectionValue = 10 * 60 * 1000;
+
 
 //We setup the options object and import the oauth token.
 var token = require('./secrets.js').twitchToken;
@@ -27,6 +31,8 @@ var options = {
 };
 
 var client = module.exports.client = new irc.Client("irc.twitch.tv", config.userName, options);
+
+client.quitting = false;
 
 //We store Channel objects that we pass messages to
 var channels = {};
@@ -48,8 +54,25 @@ var joinChannel = module.exports.joinChannel = function(channel){
 }
 
 client.on('disconnected', function(){
+    //Never fires. Stupid IRC library.
     log.info("DISCONNECTED", arguments);
     client.connect(10);
+});
+
+//Wait, client.on('disconnect') does nothing? Hook the underlying connection, then.
+client.conn.on('close', function (had_error) {
+    if (!client.quitting) {
+        if (had_error) {
+            log.info("Connection closed, with error - reconnecting");
+        } else {
+            log.info("Connection closed, without error - reconnecting");
+        }
+        client.connect(10);
+    } else {
+        log.info("Connection closed while quitting");
+        log.info("Bailing...");
+        process.exit();
+    }
 });
 
 client.on('connect', function(){
@@ -57,11 +80,17 @@ client.on('connect', function(){
     //to rewrite the moderator code.
     log.debug("Connected - sending CAP request");
     client.conn.write("CAP REQ :twitch.tv/membership\r\n");
+<<<<<<< HEAD
+    //Keep the connection alive - send an ACK every 10 seconds or so...
+    client.conn.setKeepAlive(true, 10000);
+    //And watch to see if we timeout anyway
+=======
     
     //Keep the connection alive...
     client.conn.setKeepAlive(true, 10000);
     
 
+>>>>>>> master
     disconnectionTimer = setTimeout(disconnectionTimeout, disconnectionValue);
 });
 //We add a bunch of listeners to the IRC client that forward the events ot the appropriate Channel objects.
@@ -112,7 +141,7 @@ client.on('error', function (e) {
 });
 
 client.on('raw', function (e) {
-    // log.debug('RAW:', e);
+    //Re-set the disconnection timer - Twitch PINGs every 5 minutes, which triggers this.
     if (disconnectionTimer) {
         clearTimeout(disconnectionTimer);
     }

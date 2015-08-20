@@ -1,105 +1,107 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <SchemaVersion>2.0</SchemaVersion>
-        <ProjectGuid>{771a041d-9b3a-4576-ae48-2f688ed14294}</ProjectGuid>
-        <ProjectHome />
-        <ProjectView>ShowAllFiles</ProjectView>
-        <StartupFile>legbot.js</StartupFile>
-        <WorkingDirectory>.</WorkingDirectory>
-        <OutputPath>.</OutputPath>
-        <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
-        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
-        <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
-    <ItemGroup>
-        <Content Include="README.md" />
-        <Compile Include="client.js" />
-        <Compile Include="config.js" />
-        <Compile Include="legbot.js" />
-        <Compile Include="log.js" />
-        <Compile Include="otherchannels.js" />
-        <Compile Include="lib\channel.js" />
-        <Compile Include="lib\google_calendar.js" />
-        <Compile Include="lib\models.js" />
-        <Compile Include="lib\twitch.js" />
-        <Compile Include="web\index.js" />
-        <Compile Include="lib\commands\advice.js" />
-        <Compile Include="lib\commands\calendar.js" />
-        <Compile Include="lib\commands\commandset.js" />
-        <Compile Include="lib\commands\common.js" />
-        <Compile Include="lib\commands\index.js" />
-        <Compile Include="lib\commands\replies.js" />
-        <Compile Include="lib\commands\simple_commands.js" />
-        <Compile Include="lib\commands\statistics.js" />
-        <Compile Include="web\api\channel.js" />
-        <Compile Include="web\api\index.js" />
-        <Compile Include="web\api\live.js" />
-        <Compile Include="web\page\index.js" />
-        <Compile Include="web\page\live.js" />
-        <Compile Include="web\page\stats.js" />
-        <Content Include="web\static\dickbutt.txt" />
-        <Content Include="web\static\apirefresher.html" />
-        <Content Include="web\static\style.css" />
-        <Compile Include="web\static\live.js" />
-        <Content Include="web\views\footer.jade" />
-        <Content Include="web\views\header.jade" />
-        <Content Include="web\views\index.jade" />
-        <Content Include="web\views\live.jade" />
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="lib" />
-        <Folder Include="lib\commands" />
-        <Folder Include="logs" />
-        <Folder Include="web" />
-        <Folder Include="web\api" />
-        <Folder Include="web\page" />
-        <Folder Include="web\static" />
-        <Folder Include="web\views" />
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-    <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
-    <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
-    <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
-    <ProjectExtensions>
-        <VisualStudio>
-          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
-            <WebProjectProperties>
-              <UseIIS>False</UseIIS>
-              <AutoAssignPort>True</AutoAssignPort>
-              <DevelopmentServerPort>0</DevelopmentServerPort>
-              <DevelopmentServerVPath>/</DevelopmentServerVPath>
-              <IISUrl>http://localhost:48022/</IISUrl>
-              <NTLMAuthentication>False</NTLMAuthentication>
-              <UseCustomServer>True</UseCustomServer>
-              <CustomServerUrl>http://localhost:1337</CustomServerUrl>
-              <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
-            </WebProjectProperties>
-          </FlavorProperties>
-          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
-            <WebProjectProperties>
-              <StartPageUrl>
-              </StartPageUrl>
-              <StartAction>CurrentPage</StartAction>
-              <AspNetDebugging>True</AspNetDebugging>
-              <SilverlightDebugging>False</SilverlightDebugging>
-              <NativeDebugging>False</NativeDebugging>
-              <SQLDebugging>False</SQLDebugging>
-              <ExternalProgram>
-              </ExternalProgram>
-              <StartExternalURL>
-              </StartExternalURL>
-              <StartCmdLineArguments>
-              </StartCmdLineArguments>
-              <StartWorkingDirectory>
-              </StartWorkingDirectory>
-              <EnableENC>False</EnableENC>
-              <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
-            </WebProjectProperties>
-          </FlavorProperties>
-        </VisualStudio>
-    </ProjectExtensions>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{771a041d-9b3a-4576-ae48-2f688ed14294}</ProjectGuid>
+    <ProjectHome />
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile>legbot.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="README.md" />
+    <Compile Include="client.js" />
+    <Compile Include="config.js" />
+    <Compile Include="legbot.js" />
+    <Compile Include="lib\antispam.js" />
+    <Compile Include="lib\commands\antispam.js" />
+    <Compile Include="log.js" />
+    <Compile Include="otherchannels.js" />
+    <Compile Include="lib\channel.js" />
+    <Compile Include="lib\google_calendar.js" />
+    <Compile Include="lib\models.js" />
+    <Compile Include="lib\twitch.js" />
+    <Compile Include="web\index.js" />
+    <Compile Include="lib\commands\advice.js" />
+    <Compile Include="lib\commands\calendar.js" />
+    <Compile Include="lib\commands\commandset.js" />
+    <Compile Include="lib\commands\common.js" />
+    <Compile Include="lib\commands\index.js" />
+    <Compile Include="lib\commands\replies.js" />
+    <Compile Include="lib\commands\simple_commands.js" />
+    <Compile Include="lib\commands\statistics.js" />
+    <Compile Include="web\api\channel.js" />
+    <Compile Include="web\api\index.js" />
+    <Compile Include="web\api\live.js" />
+    <Compile Include="web\page\index.js" />
+    <Compile Include="web\page\live.js" />
+    <Compile Include="web\page\stats.js" />
+    <Content Include="web\static\dickbutt.txt" />
+    <Content Include="web\static\apirefresher.html" />
+    <Content Include="web\static\style.css" />
+    <Compile Include="web\static\live.js" />
+    <Content Include="web\views\footer.jade" />
+    <Content Include="web\views\header.jade" />
+    <Content Include="web\views\index.jade" />
+    <Content Include="web\views\live.jade" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="lib" />
+    <Folder Include="lib\commands" />
+    <Folder Include="logs" />
+    <Folder Include="web" />
+    <Folder Include="web\api" />
+    <Folder Include="web\page" />
+    <Folder Include="web\static" />
+    <Folder Include="web\views" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
