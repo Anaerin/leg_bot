@@ -35,7 +35,7 @@ var client = module.exports.client = new irc.Client("irc.twitch.tv", config.user
 client.quitting = false;
 
 //We store Channel objects that we pass messages to
-var channels = {};
+var channels = module.exports.channels = {};
 
 //This will get thrown a bunch of channel models that we should enter
 //and then start throwing messages at.
@@ -51,6 +51,15 @@ var joinChannel = module.exports.joinChannel = function(channel){
 
 	channels[channel.hashtag] = channel;
 	client.join(channel.hashtag);
+}
+
+var partChannel = module.exports.partChannel = function (channel){
+    if (!channels[channel.hashtag]) {
+        return;
+    }
+    log.info('leaving', channel.hashtag);
+    delete channels[channel.hashtag];
+    client.part(channel.hashtag);
 }
 
 client.on('disconnected', function(){
@@ -80,17 +89,9 @@ client.on('connect', function(){
     //to rewrite the moderator code.
     log.debug("Connected - sending CAP request");
     client.conn.write("CAP REQ :twitch.tv/membership\r\n");
-<<<<<<< HEAD
     //Keep the connection alive - send an ACK every 10 seconds or so...
     client.conn.setKeepAlive(true, 10000);
     //And watch to see if we timeout anyway
-=======
-    
-    //Keep the connection alive...
-    client.conn.setKeepAlive(true, 10000);
-    
-
->>>>>>> master
     disconnectionTimer = setTimeout(disconnectionTimeout, disconnectionValue);
 });
 //We add a bunch of listeners to the IRC client that forward the events ot the appropriate Channel objects.
