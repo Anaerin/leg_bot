@@ -64,8 +64,8 @@ var partChannel = module.exports.partChannel = function (channel){
 
 client.on('disconnected', function(){
     //Never fires. Stupid IRC library.
-    log.info("DISCONNECTED", arguments);
-    client.connect(10);
+    log.info("DISCONNECTED fired.", arguments);
+    //client.connect(10);
 });
 
 //Wait, client.on('disconnect') does nothing? Hook the underlying connection, then.
@@ -75,6 +75,9 @@ client.conn.on('close', function (had_error) {
             log.info("Connection closed, with error - reconnecting");
         } else {
             log.info("Connection closed, without error - reconnecting");
+        }
+        if (disconnectionTimer) {
+            clearTimeout(disconnectionTimer);
         }
         client.connect(10);
     } else {
@@ -92,7 +95,7 @@ client.on('connect', function(){
     //Keep the connection alive - send an ACK every 10 seconds or so...
     client.conn.setKeepAlive(true, 10000);
     //And watch to see if we timeout anyway
-    disconnectionTimer = setTimeout(disconnectionTimeout, disconnectionValue);
+    if (!client.quitting) disconnectionTimer = setTimeout(disconnectionTimeout, disconnectionValue);
 });
 //We add a bunch of listeners to the IRC client that forward the events ot the appropriate Channel objects.
 client.on('message', function(user, channel, message){
@@ -150,6 +153,9 @@ client.on('raw', function (e) {
 })
 
 function disconnectionTimeout() {
+    if (disconnectionTimer) {
+        clearTimeout(disconnectionTimer);
+    }    
     log.info("Didn't receive anything from the server in the last 10 minutes. Timeout? Retry the connection");
-    client.connect(10);
+    if (!client.quitting) client.connect(10);
 }
