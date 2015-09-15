@@ -47,10 +47,12 @@ var joinChannel = module.exports.joinChannel = function(channel){
 	if(channels[channel.hashtag]){
 		return;
 	}
-	log.info('joining', channel.hashtag);
-
-	channels[channel.hashtag] = channel;
-	client.join(channel.hashtag);
+    if (channel.model.active) {
+        log.info('joining', channel.hashtag);
+        
+        channels[channel.hashtag] = channel;
+        client.join(channel.hashtag);
+    }
 }
 
 var partChannel = module.exports.partChannel = function (channel){
