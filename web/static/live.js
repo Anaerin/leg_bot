@@ -57,10 +57,12 @@
 		if(channel._lb_offline){
 			header.innerHTML += " ?";
 		}
-
+        var logo = document.createElement('img');
+        logo.classList.add('channel_logo');
+        logo.src = channel.channel.logo.replace('300x300', '150x150');
 		var picture = document.createElement('img');
 		picture.classList.add('live_picture');
-		picture.src = channel.preview.medium + "?t=" + new Date();
+		picture.src = channel.preview.large + "?t=" + new Date();
 
 		var game = document.createElement('div');
 		game.classList.add('live_game');
@@ -69,6 +71,7 @@
 
 
 		container.appendChild(header);
+		container.appendChild(logo);
 		container.appendChild(picture);
 		container.appendChild(game);
 
