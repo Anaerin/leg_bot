@@ -32,7 +32,7 @@ var options = {
 
 var client = module.exports.client = new irc.Client("irc.twitch.tv", config.userName, options);
 
-client.quitting = false;
+var quitting = module.exports.quitting = false;
 
 //We store Channel objects that we pass messages to
 var channels = module.exports.channels = {};

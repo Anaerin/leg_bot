@@ -1,8 +1,11 @@
 - var title = "Awesome channels currently live";
+include ./preprocess.jade
 doctype html
 html
-	include ./header.jade
+	head
+		include ./header.jade
 	body
+		include ./heading.jade
 		p.
 			This is a list of twitch channels of the LRR Fanstream Community or otherwise related to LRR that are currently live.
 			Channels with a ? after their name might have just ended streaming or twitch is lying about them being offline.

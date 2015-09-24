@@ -52,3 +52,58 @@ a.live_channel img.live_picture {
 a.live_channel div.live_game {
 	text-align: center;
 }
+
+header {
+    background-color: black;
+    color: white;
+    padding: 2px 5px;
+}
+header ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    background-color: red;
+    margin-left: -5px;
+    margin-bottom: -2px;
+    margin-right: -5px;
+}
+header ul:after {
+    clear: both;
+    content: '';
+    display: block;
+}
+header ul li {
+    list-style: none;
+    float: left;
+    border-right: 2px solid black;
+    padding: 2px 5px;
+}
+header ul li:last-child {
+    border-right: none;
+}
+header ul li a {
+    color: white;
+    text-decoration: none;
+}
+div.submenu ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    background-color: blue;
+    color: white;
+}
+div.submenu ul:after {
+    display: block;
+    content: "";
+    clear: both;
+}
+div.submenu ul li {
+    color: white;
+    float: left;
+    border-right: 2px solid black;
+    padding: 2px 5px;
+}
+div.submenu ul li a {
+    color: white;
+    text-decoration: none;
+}

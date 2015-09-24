@@ -26,6 +26,11 @@ process.on('SIGINT', function(){
     client.client.quitting = true;
 	client.client.disconnect("Time for off line LEG DAY!", function(){
 		log.info("Disconnected.");
-	});
+    });
+    var quitTimer = setTimeout(quitTimeout, 10000);
 });
+function quitTimeout() {
+    //It's been 10 seconds, and we still haven't quit. Force it.
+    process.exit();
+}
 

@@ -1,0 +1,21 @@
+﻿- var title = name + " - Stats";
+include ./preprocess.jade
+doctype html
+html
+	head
+		include ./header.jade
+	body
+		include ./heading.jade
+		include ./statsSubmenu.jade
+		h3 For channel #{name}
+		hr
+		ul
+			each stat, value in stats
+				li
+					| #{stat.value} 
+					a(href='/stats/channel/#{name}/count/#{stat.url}') #{stat.stat}
+		ul
+			each gameName, value in games
+				li
+					a(href='/stats/channel/#{name}/game/#{gameName.url}') #{gameName.game}
+	include ./footer.jade

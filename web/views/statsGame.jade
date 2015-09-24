@@ -1,0 +1,28 @@
+﻿- var title = game + " - Stats";
+include ./preprocess.jade
+doctype html
+html
+	head
+		include ./header.jade
+	body
+		include ./heading.jade
+		include ./statsSubmenu.jade
+		h3 For game #{game}
+		hr
+		h4 Played by
+		ul
+			each user, value in players
+				li
+					| #{user}
+		hr
+		h4 Logged
+		ul
+			each stat, value in stats
+				li
+					- if(stat.countValue==1){
+						| #{stat.countValue} #{stat.single}
+					- } 
+					- else {
+						| #{stat.countValue} #{stat.plural}
+					- }
+	include ./footer.jade

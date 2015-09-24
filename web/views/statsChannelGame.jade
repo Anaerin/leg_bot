@@ -1,0 +1,21 @@
+﻿- var title = name + " - " + game + " - Stats";
+include ./preprocess.jade
+doctype html
+html
+	head
+		include ./header.jade
+	body
+		include ./heading.jade
+		include ./statsSubmenu.jade
+		h3 For game #{game} in channel #{name}
+		hr
+		ul
+			each stat, value in stats
+				li
+					- if(stat.total==1){
+						| #{stat.total} #{stat.single}
+					- } 
+					- else {
+						| #{stat.total} #{stat.plural}
+					- }
+	include ./footer.jade

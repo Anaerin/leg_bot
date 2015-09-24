@@ -1,0 +1,13 @@
+﻿include ./preprocess.jade
+doctype html
+html
+	head
+		include ./header.jade
+	body
+		include ./heading.jade
+		include ./statsSubmenu.jade
+		ul
+			each stat, value in stats
+				li
+					a(href='/stats/#{subpage}/#{stat.url}') #{stat.stat} (#{stat.value})
+	include ./footer.jade
