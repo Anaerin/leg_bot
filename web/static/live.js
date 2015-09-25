@@ -57,9 +57,11 @@
 		if(channel._lb_offline){
 			header.innerHTML += " ?";
 		}
-        var logo = document.createElement('img');
-        logo.classList.add('channel_logo');
-        logo.src = channel.channel.logo.replace('300x300', '150x150');
+        if (channel.channel.logo) {
+            var logo = document.createElement('img');
+            logo.classList.add('channel_logo');
+            logo.src = channel.channel.logo.replace('300x300', '150x150');
+        }
 		var picture = document.createElement('img');
 		picture.classList.add('live_picture');
 		picture.src = channel.preview.large + "?t=" + new Date();
@@ -71,7 +73,7 @@
 
 
 		container.appendChild(header);
-		container.appendChild(logo);
+        if (logo) container.appendChild(logo);
 		container.appendChild(picture);
 		container.appendChild(game);
 
