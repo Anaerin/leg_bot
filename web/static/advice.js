@@ -72,6 +72,11 @@
     
 	function buildDiv(advice){
         var row = document.createElement('tr');
+        
+        if (advice.score < 1) {
+            row.classList.add('removed');
+        }
+        
         [advice.advice, advice.author, advice.channel, advice.game, advice.score].forEach(function (nodeValue) {
             var cell = document.createElement('td');
             cell.appendChild(document.createTextNode(nodeValue));

@@ -154,3 +154,6 @@ a.voting:hover {
     background-color: #bbbbbb;
     cursor: pointer;
 }
+table.adviceTable tr.removed {
+    color: #888888;
+}
