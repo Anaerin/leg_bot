@@ -39,8 +39,7 @@ a.live_channel img.channel_logo {
 	top: -5px;
 	left: -5px;
 	margin-bottom: -150px;
-	
-	box-shadow: 5px 5px 15px #000;
+    filter: drop-shadow(7px 7px 7px black);
 	width: 150px;
 	height: 150px;
 }
