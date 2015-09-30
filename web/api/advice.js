@@ -24,21 +24,25 @@ app.use(session({
 }));
 
 app.post('/:id/:vote', function (req, res) {
-    var myRes = res;
-    var myReq = req
+    if (!req.session.votes) {
+        req.session.votes = {};
+    }
+    if (!req.session.votes.hasOwnProperty(req.params.id)) {
+        req.session.votes[req.params.id] = 0;
+    }
     models.Advice.findById(req.params.id)
     .then(function (advice) {
-        var res = myRes;
-        var req = myReq;
-        if (req.session && req.session.votes && req.session.votes.hasOwnProperty(req.params.id)) {
-            advice.decrement({ score: req.session.votes[req.params.id] }).then(function (advice) {
-                req.session.votes[req.params.id] = 0;
-                changeScore(advice, myRes, myReq);
+        advice.decrement({ score: req.session.votes[req.params.id] })
+        .then(function (advice) {
+            req.session.votes[req.params.id] = req.params.vote;
+            advice.increment({ score: req.session.votes[req.params.id] })
+            .then(function (advice) {
+                models.Advice.findById(advice.id).then(function(advice) {
+                    res.send(JSON.stringify({ score: advice.score, vote: req.session.votes[req.params.id] }));
+                });
             });
-        } else {
-            changeScore(advice, res, req);
-        }
-    })
+        });
+    });
 })
 
 function changeScore(advice, res, req) {
@@ -49,14 +53,14 @@ function changeScore(advice, res, req) {
     var myRes = res;
     var myReq = req;
     advice.increment({ score: req.params.vote }).then(function (advice) {
-        outputResults(myRes, myReq);
+        myRes.send(JSON.stringify({ score: advice.score, vote: req.params.vote }));
     });
 }
 
 function outputResults(res, req) {
     var myRes = res;
     var myReq = req;
-    models.sequelize.query('SELECT Advices.id, author, game, content, Channels.name, score FROM Advices INNER JOIN Channels ON Advices.ChannelId = Channels.id', { type: models.sequelize.QueryTypes.SELECT })
+    models.sequelize.query('SELECT Advices.id, author, game, content, Channels.name, score FROM Advices INNER JOIN Channels ON Advices.ChannelId = Channels.id ORDER BY RANDOM()', { type: models.sequelize.QueryTypes.SELECT })
     .then(function (advices) {
         var res = myRes;
         var req = myReq;
