@@ -39,8 +39,7 @@ a.live_channel img.channel_logo {
 	top: -5px;
 	left: -5px;
 	margin-bottom: -150px;
-	
-	box-shadow: 5px 5px 15px #000;
+    filter: drop-shadow(7px 7px 7px black);
 	width: 150px;
 	height: 150px;
 }
@@ -106,4 +105,54 @@ div.submenu ul li {
 div.submenu ul li a {
     color: white;
     text-decoration: none;
+}
+a.voting {
+    width: 2em;
+    display: block;
+}
+a.voting.active {
+    color: red;
+}
+a.vote_neutral {
+    height: 10px;
+    line-height: 10px;
+}
+table.adviceTable {
+    
+    padding: 0;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+table.adviceTable tr {
+    padding: 0;
+    margin: 0;
+}
+table.adviceTable td {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 0;
+}
+table.adviceTable th {
+    border: 1px solid black;
+    border-top: none;
+    padding: 5px;
+    margin: 0;
+}
+table.adviceTable th:first-child {
+    border-left: none;
+}
+table.adviceTable th:last-child {
+    border-left: none;
+    border-right: none;
+}
+table.adviceTable td.voteButtons {
+    text-align: center;
+    padding: 0;
+}
+a.voting:hover {
+    background-color: #bbbbbb;
+    cursor: pointer;
+}
+table.adviceTable tr.removed {
+    color: #888888;
 }
