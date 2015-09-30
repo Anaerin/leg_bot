@@ -107,3 +107,50 @@ div.submenu ul li a {
     color: white;
     text-decoration: none;
 }
+a.voting {
+    width: 2em;
+    display: block;
+}
+a.voting.active {
+    color: red;
+}
+a.vote_neutral {
+    height: 10px;
+    line-height: 10px;
+}
+table.adviceTable {
+    
+    padding: 0;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+table.adviceTable tr {
+    padding: 0;
+    margin: 0;
+}
+table.adviceTable td {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 0;
+}
+table.adviceTable th {
+    border: 1px solid black;
+    border-top: none;
+    padding: 5px;
+    margin: 0;
+}
+table.adviceTable th:first-child {
+    border-left: none;
+}
+table.adviceTable th:last-child {
+    border-left: none;
+    border-right: none;
+}
+table.adviceTable td.voteButtons {
+    text-align: center;
+    padding: 0;
+}
+a.voting:hover {
+    background-color: #bbbbbb;
+    cursor: pointer;
+}

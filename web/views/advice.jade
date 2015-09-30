@@ -1,8 +1,15 @@
-- var title = "Advice";
+include ./preprocess.jade
 doctype html
 html
-	include ./header.jade
+	head
+		include ./header.jade
+	body
+		include ./heading.jade
+		include ./statsSubmenu.jade
 		p.
-			Advices.
-		div#live_streams
-	include ./footer.jade
+			Here's all the advice that's been submitted so far.
+		div#advices
+		script(
+			src='/static/advice.js'
+			type='text/javascript'
+		)
