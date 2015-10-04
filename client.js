@@ -26,7 +26,7 @@ var options = {
 	'userName': config.userName,
 	'realName': config.userName,
     'password': token,
-    'floodProtection': true,
+    'floodProtection': false,
     'encoding': 'UTF-8',
 };
 
