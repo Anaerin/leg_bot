@@ -70,6 +70,7 @@ module.exports.whisper = function (user, channel, message) {
 	};
 	if (whisperconnConnected) {
 		//If we can send a whisper...
+		log.info("Whispering to ", user.username, ": ", message);
 		whisperconn.whisper(user.username, message);
 	} else {
 		//Otherwise use the fallback method of spamming chat.
@@ -79,6 +80,7 @@ module.exports.whisper = function (user, channel, message) {
 var replayWhisper = function () {
 	// Blacklist this user from receiving whispers in the future?
 	if (lastWhisper) {
+		log.info("Whispering failed(?), saying to ", lastWhisper.channel.hashtag, ": ", lastWhisper.user['display-name'] + ": " + lastWhisper.message);
 		client.say(lastWhisper.channel.hashtag, lastWhisper.user['display-name'] + ": " + lastWhisper.message);
 	}
 }
