@@ -10,7 +10,7 @@ var Channel = require('./lib/channel.js');
 
 var Web = require('./web');
 
-client.client.on('connect', function(){
+client.client.on('connected', function(){
 	log.info("Connected!");
 	loadChannels();
 });
@@ -24,9 +24,8 @@ function loadChannels(){
 process.on('SIGINT', function(){
 	log.info("Got SIGINT! Disconnecting IRC and exiting.");
     client.client.quitting = true;
-	client.client.disconnect("Time for off line LEG DAY!", function(){
-		log.info("Disconnected.");
-    });
+	client.whisperconn.disconnect();
+	client.client.disconnect();
     var quitTimer = setTimeout(quitTimeout, 10000);
 });
 function quitTimeout() {
