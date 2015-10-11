@@ -36,6 +36,7 @@ var ircClient = function () {
     this.clientConnection.on('connected', this.onChatConnect);
     this.clientConnection.on('disconnected', this.onChatDisconnect);
     this.clientConnection.on('join', this.onChatJoin);
+    this.clientConnection.on('part', this.onChatPart);
     this.clientConnection.on('notice', this.onChatNotice);
     this.clientConnection.connect();    
     
@@ -102,6 +103,12 @@ c.onChatJoin = function (channel, user) {
     }
 }
 
+c.onChatPart = function (channel, user) {
+    if (this.parent.channels.hasOwnProperty(channel)) {
+        this.parent.channels[channel].users[user] = null;
+    }
+}
+
 c.onChatNotice = function (channel, msgid, message) {
     switch (msgid) {
         default:
@@ -131,7 +138,7 @@ c.onWhisperNotice = function (channel, msgid, message) {
     switch (msgid) {
         case "whisper_restricted_recipient":
             log.warn("Restricted whisper message. Channel ", channel, ", id ", msgid, ", message ", message);
-            this.parent.replayWhisper();
+            this.parent.replayWhisper(true);
             break;
         default:
             log.info("Whisper connection notice received: ", channel, " - ", msgid);
@@ -154,7 +161,8 @@ c.onWhisper = function (user, message) {
 
 c.options = {
 	options: {
-		debug: false
+        debug: false,
+        logger: log
 	},
 	connection: {
 		random: 'chat',
@@ -167,7 +175,8 @@ c.options = {
 };
 c.whisper_options = {
 	options: {
-		debug: false
+        debug: false,
+        logger: log
 	},
 	connection: {
 		random: 'group',
@@ -222,7 +231,7 @@ c.whisper = function (user, channel, message) {
 		client.whisperConnection.whisper(username, message);
 	} else {
 		//Otherwise use the fallback method of spamming chat.
-		client.replayWhisper();
+		client.replayWhisper(false);
 	}
 }
 
@@ -239,20 +248,44 @@ c.findChannel = function (username) {
     }
     return false;
 }
-c.replayWhisper = function () {
+c.replayWhisper = function(isError) {
 	// Blacklist this user from receiving whispers in the future?
-	if (client.lastWhisper) {
-        if (client.lastWhisper.channel) {
-            log.info("Whispering failed(?), saying to ", client.lastWhisper.channel.hashtag, ": ", client.lastWhisper.user['display-name'] + ": " + client.lastWhisper.message);
-            client.clientConnection.say(client.lastWhisper.channel.hashtag, client.lastWhisper.user['display-name'] + ": " + client.lastWhisper.message);
+    var isFromWhisper = false;
+    if (client.lastWhisper) {
+        var displayname, username = client.lastWhisper.user;
+        if (username.username) {
+            username = username.username;
+        }
+        if (client.lastWhisper.user['display-name']) {
+            displayname = client.lastWhisper.user['display-name'];
         } else {
-            log.warn("Failed to whisper to ", client.lastWhisper.user.username, ", message: ", client.lastWhisper.message);
-            // I don't have a channel to message them back on. Find one and let them know the whisper failed.
-            var foundChannel = client.findChannel(client.lastWhisper.user);
-            if (foundChannel) {
-                //I found a channel - let them know.
-                foundChannel.say("ATTENTION " + client.lastWhisper.user['display-name'] + ", I just tried to whisper back to you, but was blocked. Are you following me?");
+            displayname = username;
+        }
+        var hashtag = client.lastWhisper.channel;
+        if (hashtag) {
+            if (hashtag.hashtag) {
+                hashtag = hashtag.hashtag;
             }
+        } else {
+            //We don't have a source channel, so this is in reply to a whisper.
+            isFromWhisper = true;
+            var foundChannel = client.findChannel(username);
+            if (foundChannel) {
+                hashtag = foundChannel.hashtag;
+            } else {
+                log.warn("Failed completely to find", username, "message:", client.lastWhisper.message);
+                return;
+            }
+        }
+        if (isError) {
+            log.info("Whispering failed(?), saying to ", hashtag, ": ", displayname + ": " + client.lastWhisper.message);
+            if (isFromWhisper) {
+                client.clientConnection.say(hashtag, displayname + " (whisper failed, replying to first common channel, are you following?): " + client.lastWhisper.message);
+            } else {
+                client.clientConnection.say(hashtag, displayname + " (whisper failed, are you following?): " + client.lastWhisper.message);
+            }
+        } else {
+            client.clientConnection.say(hashtag, displayname + ": " + client.lastWhisper.message);
         }
 	}
 }
@@ -265,7 +298,6 @@ c.joinChannel = function(channel){
 	}
 	if (channel.model.active) {
 		log.info('joining', channel.hashtag);
-		
         client.channels[channel.hashtag] = channel;
         client.clientConnection.join(channel.hashtag);
         channel.client = client;
