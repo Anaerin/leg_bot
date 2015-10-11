@@ -6,161 +6,318 @@
 
 "use strict";
 
-var irc = require('irc');
+var tmi = require('tmi.js');
 var log = require('./log.js');
 var Models = require('./lib/models.js');
 
-var channel = require('./lib/channel.js');
+var Channel = require('./lib/channel.js');
 
 var config = require('./config.js').irc;
 
-//Set up disconnection timer for inactivity
-//Twitch sends a PING every 5 minutes. If 10 minutes pass with no activity, we've been silently DC'd
-var disconnectionTimer;
-var disconnectionValue = 10 * 60 * 1000;
-
+var commands = require('./lib/commands');
 
 //We setup the options object and import the oauth token.
 var token = require('./secrets.js').twitchToken;
-var options = {
-	'userName': config.userName,
-	'realName': config.userName,
-    'password': token,
-    'floodProtection': false,
-    'encoding': 'UTF-8',
+
+var ircClient = function () {
+    if (client) return client;
+    // Let's make ourselves an object...
+
+    //First, we need a few clients...
+    this.clientConnection = new tmi.client(this.options);
+    this.clientConnection.parent = this;
+    this.whisperConnection = new tmi.client(this.whisper_options);
+    this.whisperConnection.parent = this;
+    
+    //Then we add listeners to those clients.
+    this.clientConnection.on('chat', this.onChat);
+    this.clientConnection.on('mod', this.onMod);
+    this.clientConnection.on('unmod', this.onUnMod);
+    this.clientConnection.on('connected', this.onChatConnect);
+    this.clientConnection.on('disconnected', this.onChatDisconnect);
+    this.clientConnection.on('join', this.onChatJoin);
+    this.clientConnection.on('part', this.onChatPart);
+    this.clientConnection.on('notice', this.onChatNotice);
+    this.clientConnection.connect();    
+    
+    this.whisperConnection.on('connected', this.onWhisperConnect);
+    this.whisperConnection.on('disconnected', this.onWhisperDisconnect);
+    this.whisperConnection.on('notice', this.onWhisperNotice);
+    this.whisperConnection.on('whisper', this.onWhisper);
+    this.whisperConnection.connect();
+
+    //Then we attach whisper handlers directly.
+    this.attachWhispers();
+
+}
+
+var c = ircClient.prototype;
+c.lastWhisper = {};
+
+c.disconnect = function () {
+    this.clientConnection.disconnect();
+    this.whisperConnection.disconnect();
+}
+
+c.onChatConnect = function (address, port) {
+    client.clientConnected = true;
+    log.info("Chat channel connected");
+    Channel.findActiveChannels(this.parent.joinChannels);
+}
+
+c.onChat = function (channel, user, message, self) {
+    if (self) {
+        //We don't care what we said.
+        return;
+    }
+    var channel = this.parent.channels[channel];
+    //Update the channel's users object with the latest version of this user's object. Yes, I know it's a little confusing...
+    channel.users[user] = user;
+    channel.onMessage(user, message);
 };
 
-var client = module.exports.client = new irc.Client("irc.twitch.tv", config.userName, options);
+c.onMod = function (channel, user) {
+    var channel = this.parent.channels[channel];
+    channel.onUserModded(user);
+}
 
-var quitting = module.exports.quitting = false;
+c.onUnMod = function (channel, user) {
+    var channel = this.parent.channels[channel];
+    channel.onUserUnmodded(user);
+}
+
+c.onChatDisconnect = function (reason) {
+    client.clientConnected = false;
+    log.warn("Chat channel disconnected: ", reason);
+    if (this.parent.quitting && !whisperconnConnected) {
+        process.exit();
+    }
+}
+
+c.onChatJoin = function (channel, user) {
+    if (this.parent.channels.hasOwnProperty(channel)) {
+        if (!this.parent.channels[channel].users.hasOwnProperty(user)) {
+            // If this user has joined and hasn't spoken yet, add a basic, empty user object
+            this.parent.channels[channel].users[user] = { username: user, 'display-name': user };
+        }
+    }
+}
+
+c.onChatPart = function (channel, user) {
+    if (this.parent.channels.hasOwnProperty(channel)) {
+        this.parent.channels[channel].users[user] = null;
+    }
+}
+
+c.onChatNotice = function (channel, msgid, message) {
+    switch (msgid) {
+        default:
+            log.info("Chat connection notice: ", channel, " - ", msgid, " (", message, ")");
+            break;
+    }
+}
+
+c.onWhisperConnect = function (address, port) {
+    client.whisperconnConnected = true;
+    log.info("Whisper channel connected");
+}
+
+c.onWhisperDisconnect = function (reason) {
+    client.whisperconnConnected = false;
+    log.warn("Whisper channel disconnected:", reason);
+    if (reason == "Unable to connect.") {
+        log.info("Attempting to reconnect...");
+        this.connect();
+    }
+    if (this.parent.quitting && !this.parent.clientConnected) {
+        process.exit();
+    }
+}
+
+c.onWhisperNotice = function (channel, msgid, message) {
+    switch (msgid) {
+        case "whisper_restricted_recipient":
+            log.warn("Restricted whisper message. Channel ", channel, ", id ", msgid, ", message ", message);
+            this.parent.replayWhisper(true);
+            break;
+        default:
+            log.info("Whisper connection notice received: ", channel, " - ", msgid);
+            break;
+    }
+}
+
+c.onWhisper = function (user, message) {
+    //We got a whisper. Do something with it.
+    log.info("Whisper received:", user, " - ", message);
+    if (message[0] != '!') return;
+    
+    this.log.info("W:", user['display-name'], "M:", message);
+    
+    this.parent.whisperCommands.forEach(function (command) {
+        command.onWhisper(user, message.substr(1, message.length));
+    });
+ 
+}
+
+c.options = {
+	options: {
+        debug: false,
+        logger: log
+	},
+	connection: {
+		random: 'chat',
+		reconnect: true
+	},
+	identity: {
+		username: config.userName,
+		password: token
+	}
+};
+c.whisper_options = {
+	options: {
+        debug: false,
+        logger: log
+	},
+	connection: {
+		random: 'group',
+		reconnect: true
+	},
+	identity: {
+		username: config.userName,
+		password: token
+	}
+
+}
+c.whisperCommands = [];
+
+c.clientConnected = false;
+c.whisperconnConnected = false;
+
+c.quitting = false;
 
 //We store Channel objects that we pass messages to
-var channels = module.exports.channels = {};
+c.channels = {};
+c.attachWhispers = function () {
+    this.attachWhisper(commands.common);
+    this.attachWhisper(commands.calendar);
+    this.attachWhisper(commands.antispam);
+    this.attachWhisper(commands.advice);
+    this.attachWhisper(commands.joinpart);
+}
+
+c.attachWhisper = function (constructor) {
+    var exists = this.whisperCommands.some(function (m) {
+        return m instanceof constructor;
+    });
+    
+    if (!exists) {
+        this.whisperCommands.push(new constructor(this));
+    }
+}
+
+c.whisper = function (user, channel, message) {
+    var username = user;
+    if (user.username) {
+        username = user.username;
+    }
+    client.lastWhisper = {
+		user: username ,
+		channel: channel,
+		message: message
+	};
+	if (client.whisperconnConnected) {
+		//If we can send a whisper...
+		log.info("Whispering to ", username , ": ", message);
+		client.whisperConnection.whisper(username, message);
+	} else {
+		//Otherwise use the fallback method of spamming chat.
+		client.replayWhisper(false);
+	}
+}
+
+c.say = function (channel, message) {
+    client.clientConnection.say(channel, message);
+}
+
+c.findChannel = function (username) {
+    for (var i = 0; i < client.channels.length; i++) {
+        var channel = client.channels[i];
+        if (channel.users && channel.users.hasOwnProperty(username)) {
+            return channel;
+        }
+    }
+    return false;
+}
+c.replayWhisper = function(isError) {
+	// Blacklist this user from receiving whispers in the future?
+    var isFromWhisper = false;
+    if (client.lastWhisper) {
+        var displayname, username = client.lastWhisper.user;
+        if (username.username) {
+            username = username.username;
+        }
+        if (client.lastWhisper.user['display-name']) {
+            displayname = client.lastWhisper.user['display-name'];
+        } else {
+            displayname = username;
+        }
+        var hashtag = client.lastWhisper.channel;
+        if (hashtag) {
+            if (hashtag.hashtag) {
+                hashtag = hashtag.hashtag;
+            }
+        } else {
+            //We don't have a source channel, so this is in reply to a whisper.
+            isFromWhisper = true;
+            var foundChannel = client.findChannel(username);
+            if (foundChannel) {
+                hashtag = foundChannel.hashtag;
+            } else {
+                log.warn("Failed completely to find", username, "message:", client.lastWhisper.message);
+                return;
+            }
+        }
+        if (isError) {
+            log.info("Whispering failed(?), saying to ", hashtag, ": ", displayname + ": " + client.lastWhisper.message);
+            if (isFromWhisper) {
+                client.clientConnection.say(hashtag, displayname + " (whisper failed, replying to first common channel, are you following?): " + client.lastWhisper.message);
+            } else {
+                client.clientConnection.say(hashtag, displayname + " (whisper failed, are you following?): " + client.lastWhisper.message);
+            }
+        } else {
+            client.clientConnection.say(hashtag, displayname + ": " + client.lastWhisper.message);
+        }
+	}
+}
 
 //This will get thrown a bunch of channel models that we should enter
 //and then start throwing messages at.
-module.exports.joinChannels = function(channels){
-	channels.forEach(joinChannel);
-}
-
-var joinChannel = module.exports.joinChannel = function(channel){
-	if(channels[channel.hashtag]){
+c.joinChannel = function(channel){
+	if(client.channels[channel.hashtag]){
 		return;
 	}
-    if (channel.model.active) {
-        log.info('joining', channel.hashtag);
-        
-        channels[channel.hashtag] = channel;
-        client.join(channel.hashtag);
-    }
+	if (channel.model.active) {
+		log.info('joining', channel.hashtag);
+        client.channels[channel.hashtag] = channel;
+        client.clientConnection.join(channel.hashtag);
+        channel.client = client;
+	}
 }
 
-var partChannel = module.exports.partChannel = function (channel){
-    if (!channels[channel.hashtag]) {
-        return;
-    }
-    log.info('leaving', channel.hashtag);
-    delete channels[channel.hashtag];
-    client.part(channel.hashtag);
+c.joinChannels = function (channels) {
+    log.info('Joining Channels...');
+    channels.forEach(client.joinChannel);
 }
 
-client.on('disconnected', function(){
-    //Never fires. Stupid IRC library.
-    log.info("DISCONNECTED fired.", arguments);
-    //client.connect(10);
-});
-
-//Wait, client.on('disconnect') does nothing? Hook the underlying connection, then.
-client.conn.on('close', function (had_error) {
-	if (disconnectionTimer) {
-		clearTimeout(disconnectionTimer);
-	}
-	if (!client.quitting) {
-        if (had_error) {
-            log.info("Connection closed, with error - reconnecting");
-        } else {
-            log.info("Connection closed, without error - reconnecting");
-        }
-        client.connect(10);
-    } else {
-        log.info("Connection closed while quitting");
-        log.info("Bailing...");
-        process.exit();
-    }
-});
-
-client.on('connect', function(){
-	//this is a dumb hack, but it keeps us working without having
-    //to rewrite the moderator code.
-    log.debug("Connected - sending CAP request");
-    client.conn.write("CAP REQ :twitch.tv/membership\r\n");
-    //Keep the connection alive - send an ACK every 10 seconds or so...
-    client.conn.setKeepAlive(true, 10000);
-	//And watch to see if we timeout anyway
-	if (disconnectionTimer) {
-		clearTimeout(disconnectionTimer);
-	}
-	if (!client.quitting) disconnectionTimer = setTimeout(disconnectionTimeout, disconnectionValue);
-});
-//We add a bunch of listeners to the IRC client that forward the events ot the appropriate Channel objects.
-client.on('message', function(user, channel, message){
-	var channel = channels[channel];
-
-	channel && channel.onMessage(user, message);
-});
-
-//We use this to parse op status updates
-function parseMode(channel, by, mode, argument, message){
-	//What we need is an obscure part in the message object :(
-	var args = message.args;
-
-	
-	var user = args[2];
-	var channel = channels[args[0]];
-	
-	//we do not care about anything other than O (giggity)
-	if(mode != 'o'){
+c.partChannel = function (channel){
+	if (!channels[channel.hashtag]) {
 		return;
 	}
-	if(!channel){
-		return;
-	}
-
-	if(args[1] == '+o'){
-		channel.onUserModded(user);
-	}
-	else if(args[1] == '-o'){
-		channel.onUserUnmodded(user);
-	}
+	log.info('leaving', channel.hashtag);
+	delete channels[channel.hashtag];
+    this.parent.clientConnection.part(channel.hashtag);
 }
 
-client.on('+mode', parseMode);
-client.on('-mode', parseMode);
+var client = new ircClient();
 
-client.on('ping', function(){
-    log.info("Got PING from twitch");
-});
-
-client.on('netError', function(e){
-	log.error('IRC lib netError:', e);
-});
-
-client.on('error', function (e) {
-    log.error('IRC Server error:', e);
-});
-
-client.on('raw', function (e) {
-    //Re-set the disconnection timer - Twitch PINGs every 5 minutes, which triggers this.
-    if (disconnectionTimer) {
-        clearTimeout(disconnectionTimer);
-    }
-    disconnectionTimer = setTimeout(disconnectionTimeout, disconnectionValue);
-})
-
-function disconnectionTimeout() {
-    if (disconnectionTimer) {
-        clearTimeout(disconnectionTimer);
-    }    
-    log.info("Didn't receive anything from the server in the last 10 minutes. Timeout? Retry the connection");
-    if (!client.quitting) client.connect(10);
-}
+module.exports = client;
