@@ -10,22 +10,11 @@ var Channel = require('./lib/channel.js');
 
 var Web = require('./web');
 
-client.client.on('connected', function(){
-	log.info("Connected!");
-	loadChannels();
-});
-
-function loadChannels(){
-	log.debug("Querying channels to join");
-	Channel.findActiveChannels(client.joinChannels);
-}
-
 //We do a clean disconnect on SIGINT before dying
 process.on('SIGINT', function(){
 	log.info("Got SIGINT! Disconnecting IRC and exiting.");
-    client.client.quitting = true;
-	client.whisperconn.disconnect();
-	client.client.disconnect();
+    client.quitting = true;
+	client.disconnect();
     var quitTimer = setTimeout(quitTimeout, 10000);
 });
 function quitTimeout() {
