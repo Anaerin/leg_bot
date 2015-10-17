@@ -16,6 +16,8 @@ var config = require('./config.js').irc;
 
 var commands = require('./lib/commands');
 
+var models = require('./lib/models.js');
+
 //We setup the options object and import the oauth token.
 var token = require('./secrets.js').twitchToken;
 
@@ -74,6 +76,8 @@ c.onChat = function (channel, user, message, self) {
     //Update the channel's users object with the latest version of this user's object. Yes, I know it's a little confusing...
     channel.users[user] = user;
     channel.onMessage(user, message);
+    //Update the Last Seen table...
+    client.updateLastSeen(user.username, channel.model.id);
 };
 
 c.onMod = function (channel, user) {
@@ -149,6 +153,8 @@ c.onWhisperNotice = function (channel, msgid, message) {
 c.onWhisper = function (user, message) {
     //We got a whisper. Do something with it.
     log.info("Whisper received:", user, " - ", message);
+    //Update the Last Seen table...
+    client.updateLastSeen(user, null);    
     if (message[0] != '!') return;
     
     this.log.info("W:", user['display-name'], "M:", message);
@@ -158,6 +164,15 @@ c.onWhisper = function (user, message) {
     });
  
 }
+
+c.updateLastSeen = function (user, channelID) {
+    models.LastSeen.findOrCreate({ where: { name: user }, defaults: { dateTimeSeen: Date.now() } }).spread(function (foundUser) {
+        foundUser.dateTimeSeen = Date.now();
+        foundUser.ChannelId = channelID;
+        foundUser.save();
+    });
+}
+
 
 c.options = {
 	options: {
@@ -203,6 +218,7 @@ c.attachWhispers = function () {
     this.attachWhisper(commands.antispam);
     this.attachWhisper(commands.advice);
     this.attachWhisper(commands.joinpart);
+    this.attachWhisper(commands.seen);
 }
 
 c.attachWhisper = function (constructor) {
