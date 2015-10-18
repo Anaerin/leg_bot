@@ -32,7 +32,7 @@ app.get('/Channels$', listChannels);
 
 function listChannels(req, res) {
 	var output = [];
-    models.sequelize.query("SELECT Channels.name, count(Statistics.id) AS StatsCount FROM Statistics INNER JOIN Channels ON Statistics.ChannelId = channels.id GROUP BY ChannelId", { type: models.sequelize.QueryTypes.SELECT })
+    models.sequelize.query("SELECT Channels.name, count(Statistics.id) AS StatsCount FROM Statistics INNER JOIN Channels ON Statistics.ChannelId = Channels.id GROUP BY ChannelId", { type: models.sequelize.QueryTypes.SELECT })
 	.then(function (channels) {
         channels.forEach(function (channel) {
             output.push({ stat: channel.name, url: escape(channel.name), value: channel.StatsCount });
