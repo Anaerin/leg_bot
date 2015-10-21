@@ -60,7 +60,7 @@ function changeScore(advice, res, req) {
 function outputResults(res, req) {
     var myRes = res;
     var myReq = req;
-    models.sequelize.query('SELECT Advices.id, author, game, content, Channels.name, score FROM Advices INNER JOIN Channels ON Advices.ChannelId = Channels.id ORDER BY RANDOM()', { type: models.sequelize.QueryTypes.SELECT })
+    models.sequelize.query('SELECT Advices.id, author, game, content, Channels.name, score FROM Advices INNER JOIN Channels ON Advices.ChannelId = Channels.id ORDER BY RAND()', { type: models.sequelize.QueryTypes.SELECT })
     .then(function (advices) {
         var res = myRes;
         var req = myReq;
