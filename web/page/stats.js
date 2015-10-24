@@ -18,7 +18,7 @@ app.get('/Games$', listGames);
 
 function listGames(req, res) {
     var output = [];
-    models.sequelize.query("SELECT game, SUM(value) AS count_value FROM counts GROUP BY game", { type: models.sequelize.QueryTypes.SELECT })
+    models.sequelize.query("SELECT game, SUM(value) AS count_value FROM Counts GROUP BY game", { type: models.sequelize.QueryTypes.SELECT })
 	.then(function (counts) {
         counts.forEach(function (count) {
             output.push({ stat: count.game, url: escape(count.game), value: count.count_value });
