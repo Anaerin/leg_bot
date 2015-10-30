@@ -57,11 +57,15 @@
 		if(channel._lb_offline){
 			header.innerHTML += " ?";
 		}
-        if (channel.channel.logo) {
-            var logo = document.createElement('img');
-            logo.classList.add('channel_logo');
-            logo.src = channel.channel.logo.replace('300x300', '150x150');
-        }
+		var logo = document.createElement('img');
+		logo.classList.add('channel_logo');
+		logo.width = "150";
+		logo.height = "150";
+		if (channel.channel.logo) {
+			logo.src = channel.channel.logo.replace('300x300', '150x150');
+		} else {
+		    logo.src = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="; //1x1 transparent gif
+		}
 		var picture = document.createElement('img');
 		picture.classList.add('live_picture');
 		picture.src = channel.preview.large + "?t=" + new Date();
@@ -71,9 +75,8 @@
 		channel = channel.channel || channel;
 		game.innerHTML = "Playing: " + (channel.game || "Something?");
 
-
 		container.appendChild(header);
-        if (logo) container.appendChild(logo);
+		container.appendChild(logo);
 		container.appendChild(picture);
 		container.appendChild(game);
 

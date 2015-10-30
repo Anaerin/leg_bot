@@ -36,17 +36,19 @@ a.live_channel h3.live_header {
 }
 a.live_channel img.channel_logo {
 	position: relative;
-	top: -5px;
+	top: -34px;
 	left: -5px;
-	margin-bottom: -150px;
+	margin-bottom: -145px;
     filter: drop-shadow(7px 7px 7px black);
 	width: 150px;
 	height: 150px;
+    border-top-left-radius: 10px;
 }
 a.live_channel img.live_picture {
 	margin: auto;
 	width: 640px;
 	height: 360px;
+    margin-top: -9px;
 }
 a.live_channel div.live_game {
 	text-align: center;
