@@ -11,7 +11,7 @@ ghost\_of\_leg\_bot is a twitch chat bot for the Loading Ready Run Fan Streamer 
 
 ##Help
 
-* **!help** makes ghost\_of\_leg\_bot give you a link to this page.
+* **!help** makes ghost\_of\_leg\_bot give you a link to the article about this bot on my blog. I am trying to keep that link as up-to-date as I can.
 
 ##Calendar
 
@@ -47,6 +47,11 @@ The statistics system for ghost\_of\_leg\_bot should be familiar to anyone who h
 * **!advice source** Shows information about the last given bit of advice: What channel is it from, what game was being played, and who added it.
 * **!advice count** Shows you the ammount of advice that ghost\_of\_leg\_bot knows.
 * **!advice add X** This allows channel moderators to add X as a new advice. Note, that since advices are tied to games, you'll need to use **!game override** to set a game when adding advices when a stream isn't live. Also, to avoid any tomfoolery, a piece of advice cannot start with any nonalphanumeric characters.
+* **!advice vote** This gives a link to http://ghostoflegbot.website/advice , where you can upvote or downvote the submitted advice. Any advice that gets 0 votes will be removed from the rotation. 
+
+##Joining
+
+Joining ghost\_of\_leg\_bot's channel and saying !join (or whispering !join to it) will ask it to join your channel. Similarly, saying !part (or whispering !part) will ask it to leave.
 
 ##Misc
 
@@ -56,6 +61,4 @@ The statistics system for ghost\_of\_leg\_bot should be familiar to anyone who h
 * **!fancrossing** makes ghost\_of\_leg\_bot throw a link to the survivor\_tv fan crossing spreadsheet.
 
 I have tried to add as many channels of the LRR fan stream community to the !live command as I could find.
-If I am missing any, let me know.
-
-
+It will add any streams it finds in the calendar too, but if I am missing any, let me know.
