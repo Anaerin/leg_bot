@@ -40,6 +40,7 @@ var ircClient = function () {
     this.clientConnection.on('join', this.onChatJoin);
     this.clientConnection.on('part', this.onChatPart);
     this.clientConnection.on('notice', this.onChatNotice);
+    this.clientConnection.on('roomstate', this.onRoomState);
     this.clientConnection.connect();    
     
     this.whisperConnection.on('connected', this.onWhisperConnect);
@@ -65,6 +66,11 @@ c.onChatConnect = function (address, port) {
     client.clientConnected = true;
     log.info("Chat channel connected");
     Channel.findActiveChannels(this.parent.joinChannels);
+}
+
+c.onRoomState = function (channel, state) {
+    var channel = this.parent.channels[channel];
+    channel.onRoomState();
 }
 
 c.onChat = function (channel, user, message, self) {

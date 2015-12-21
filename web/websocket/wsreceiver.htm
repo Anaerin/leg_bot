@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+	<script type="text/javascript" language="javascript">
+		function logEvent(message) {
+			var newPre = document.createElement("pre");
+			newPre.appendChild(document.createTextNode(message));
+			document.documentElement.appendChild(newPre);
+			document.documentElement.lastChild.scrollIntoView();
+		}
+		var ws;
+		function doConnect() {
+			ws = new WebSocket("ws://" + location.host + '/ws/%channelname%');
+			ws.onmessage = function (message) {
+				logEvent(message.data);
+			}
+			ws.onopen = function (evt) {
+				logEvent("Connection Open!");
+			}
+			ws.onclose = function (evt) {
+				logEvent("Connection Closed!");
+				window.setTimeout(doConnect, 1000);
+			}
+			ws.onerror = function (evt) {
+				logEvent("Error: " + evt.error);
+			}
+		}
+		window.onload = function () {
+			logEvent("Page Loaded!");
+			doConnect();
+		}
+	</script>
+</head>
+<body>
+
+</body>
+</html>
