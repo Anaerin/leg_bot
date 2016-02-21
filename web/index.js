@@ -1,11 +1,12 @@
 "use strict";
 
 var express = require("express");
-
+var expressWs = require("express-ws");
 var config = require("../config.js").web;
 
-var app = express();
-var websockets = require("express-ws")(app);
+var expressWs = expressWs(express());
+var app = expressWs.app;
+
 var jade = require('jade');
 app.engine('jade', jade.__express);
 app.set('views', './web/views');
@@ -36,13 +37,13 @@ app.use('/', require('./page'));
 
 function attachWebsocket(ws, req, next) {
     log.info("Got Websocket");
-    var channel = channelList[req.params.channel];
+    var channel = req.channel;
     if (!channel) {
-        log.warn("Unable to find channel " + req.params.channel);
-        ws.send("Unable to find channel " + req.params.channel);
+        log.warn("Unable to find channel " + req.channelName);
+        ws.send("Unable to find channel " + req.channelName);
         ws.close();
     } else {
-        log.info("Got channel " + req.params.channel);
+        log.info("Got channel " + req.channelName);
         ws.channel = channel;
         log.info("Set ws.channel");
         ws.on('close', function () {
@@ -57,7 +58,12 @@ function attachWebsocket(ws, req, next) {
     next();
 };
 
-app.ws('/ws/:channel$', attachWebsocket);
+app.param('channel', function (req, res, next, channel) {
+    req.channelName = channel;
+    req.channel = channelList[channel];
+    return next();
+})
+app.ws('/ws/:channel', attachWebsocket);
 
 function websocketTest(req, res) {
     var dump = {};
@@ -71,6 +77,6 @@ function websocketTest(req, res) {
     })
 };
 
-app.get('/ws/:channel$', websocketTest);
+app.get('/ws/:channel', websocketTest);
 
 var server = app.listen(config.port);
