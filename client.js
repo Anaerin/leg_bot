@@ -51,7 +51,7 @@ var ircClient = function () {
 
     //Then we attach whisper handlers directly.
     this.attachWhispers();
-	this.lastUpdated = new Date();
+	this.lastUpdated = new Date().valueOf();
 }
 
 var c = ircClient.prototype;
