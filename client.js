@@ -197,9 +197,9 @@ c.updateLastSeen = function (user, channelID) {
 
 c.options = {
 	options: {
-        debug: false
+		logger: log,
+		debug: false
 	},
-	logger: log,
 	connection: {
 		cluster: 'main',
 		reconnect: true
@@ -211,9 +211,9 @@ c.options = {
 };
 c.whisper_options = {
 	options: {
-        debug: false
+		debug: false,
+		logger: log
 	},
-	logger: log,
 	connection: {
 		cluster: 'group',
 		reconnect: true
@@ -226,9 +226,9 @@ c.whisper_options = {
 }
 c.aws_options = {
 	options: {
-		debug: false
+		debug: false,
+		logger: log
 	},
-	logger: log,
 	connection: {
 		cluster: 'aws',
 		reconnect: true,
@@ -289,16 +289,26 @@ c.whisper = function (user, channel, message) {
 	}
 }
 
-c.say = function (channel, message) {
+c.getConnForChannel(channelName) {
 	var clientChannels = client.clientConnection.getChannels();
 	var awsChannels = client.awsConnection.getChannels();
-	if (clientChannels.indexOf(channel) >= 0) {
-		client.clientConnection.say(channel, message);
-	} else if (awsChannels.indexOf(channel) >= 0) {
-		client.awsConnection.say(channel, message);
+	if (clientChannels.indexOf(channelName) >= 0) {
+		return client.clientConnection;
+	} else if (awsChannels.indexOf(channelName) >= 0) {
+		return client.awsConnection;
 	} else {
-		log.error("Unable to say ", message, " to channel ", channel);
+		log.error("Unable to find connection for ", channelName);
 	}
+}
+
+c.timeout = function (channelname, username, time) {
+	var clientObj = client.getConnForChannel(channelname);
+	clientObj.timeout(channelname, username, time);
+}
+
+c.say = function (channel, message) {
+	var clientObj = client.getConnForChannel(channelname);
+	clientObj.say(channel, message);
 }
 
 c.findChannel = function (username) {
@@ -377,7 +387,7 @@ c.partChannel = function (channel){
 	}
 	log.info('leaving', channel.hashtag);
 	delete channels[channel.hashtag];
-    this.parent.clientConnection.part(channel.hashtag);
+    this.parent.getConnForChannel(channel.hashtag).part(channel.hashtag);
 }
 c.onServerChange = function (channel) {
 	var me = this.parent;
