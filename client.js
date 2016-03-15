@@ -80,13 +80,13 @@ c.disconnect = function () {
 }
 
 c.onChatConnect = function (address, port) {
-    client.clientConnected = true;
-    log.info(this.network,"channel connected");
-    Channel.findActiveChannels(this.parent.joinChannels);
+	client.clientConnected = true;
+	log.info(this.network,"Connected");
+    Channel.findActiveChannels(this.parent.joinChannels, this.network);
 }
 
 c.onAWSConnect = function (address, port) {
-	log.info(this.network,"channel connected");
+	log.info(this.network,"Connected");
 }
 
 c.onRoomState = function (channel, state) {
@@ -119,7 +119,7 @@ c.onUnMod = function (channel, user) {
 
 c.onChatDisconnect = function (reason) {
     client.clientConnected = false;
-    log.warn("Chat channel disconnected: ", reason);
+    log.warn(this.network, "Chat channel disconnected: ", reason);
     if (this.parent.quitting && !whisperconnConnected) {
         process.exit();
     }
@@ -375,7 +375,7 @@ c.joinChannel = function(channel){
 		return;
 	}
 	if (channel.model.active) {
-		log.info('joining', channel.hashtag,"on network","main");
+		log.info(channel.network,'Joining', channel.hashtag);
 		client.channels[channel.hashtag] = channel;
 		client.clientConnection.join(channel.hashtag);
         channel.client = client;
@@ -383,7 +383,7 @@ c.joinChannel = function(channel){
 }
 
 c.joinChannels = function (channels) {
-    log.info('Joining Channels...');
+	log.info('Joining Channels...');
     channels.forEach(client.joinChannel);
 }
 
@@ -397,7 +397,9 @@ c.partChannel = function (channel){
 }
 c.onServerChange = function (channel) {
 	var me = this.parent;
-	log.info(channel.hashtag,"Switching to AWS");
+	log.info(this.network, channel.hashtag, "Switching to AWS");
+	channel.network = "AWS";
+	channel.bindLog();
 	me.clientConnection.part(channel.hashtag);
 	me.awsConnection.join(channel.hashtag);
 }

@@ -2,6 +2,8 @@
 
 var Winston = require('winston');
 
+var WinstonChild = require('winston-child').WinstonChild;
+
 var logLevel = require('./config.js').logging;
 
 var w = module.exports = new Winston.Logger;
