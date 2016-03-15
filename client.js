@@ -44,17 +44,19 @@ var ircClient = function () {
     this.clientConnection.on('notice', this.onChatNotice);
 	this.clientConnection.on('roomstate', this.onRoomState);
 	this.clientConnection.on('serverchange', this.onServerChange);
+	this.clientConnection.network = "Main";
     this.clientConnection.connect();    
 	
 	this.awsConnection.on('chat', this.onChat);
 	this.awsConnection.on('mod', this.onMod);
 	this.awsConnection.on('unmod', this.onUnMod);
-	this.awsConnection.on('connected', this.onChatConnect);
+	this.awsConnection.on('connected', this.onAWSConnect);
 	this.awsConnection.on('disconnected', this.onChatDisconnect);
 	this.awsConnection.on('join', this.onChatJoin);
 	this.awsConnection.on('part', this.onChatPart);
 	this.awsConnection.on('notice', this.onChatNotice);
 	this.awsConnection.on('roomstate', this.onRoomState);
+	this.awsConnection.network = "AWS";
 	this.awsConnection.connect();
     
 
@@ -79,8 +81,12 @@ c.disconnect = function () {
 
 c.onChatConnect = function (address, port) {
     client.clientConnected = true;
-    log.info("Chat channel connected");
+    log.info(this.network,"channel connected");
     Channel.findActiveChannels(this.parent.joinChannels);
+}
+
+c.onAWSConnect = function (address, port) {
+	log.info(this.network,"channel connected");
 }
 
 c.onRoomState = function (channel, state) {
@@ -137,7 +143,7 @@ c.onChatPart = function (channel, user) {
 c.onChatNotice = function (channel, msgid, message) {
     switch (msgid) {
         default:
-            log.info("Chat connection notice: ", channel, " - ", msgid, " (", message, ")");
+            log.info(this.network,"Chat connection notice: ", channel, " - ", msgid, " (", message, ")");
             break;
     }
 }
@@ -289,7 +295,7 @@ c.whisper = function (user, channel, message) {
 	}
 }
 
-c.getConnForChannel(channelName) {
+c.getConnForChannel = function(channelName) {
 	var clientChannels = client.clientConnection.getChannels();
 	var awsChannels = client.awsConnection.getChannels();
 	if (clientChannels.indexOf(channelName) >= 0) {
@@ -369,9 +375,9 @@ c.joinChannel = function(channel){
 		return;
 	}
 	if (channel.model.active) {
-		log.info('joining', channel.hashtag);
-        client.channels[channel.hashtag] = channel;
-        client.clientConnection.join(channel.hashtag);
+		log.info('joining', channel.hashtag,"on network","main");
+		client.channels[channel.hashtag] = channel;
+		client.clientConnection.join(channel.hashtag);
         channel.client = client;
 	}
 }
@@ -391,7 +397,7 @@ c.partChannel = function (channel){
 }
 c.onServerChange = function (channel) {
 	var me = this.parent;
-	log.info("Switching to AWS for channel " + channel.hashtag);
+	log.info(channel.hashtag,"Switching to AWS");
 	me.clientConnection.part(channel.hashtag);
 	me.awsConnection.join(channel.hashtag);
 }

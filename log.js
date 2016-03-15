@@ -14,5 +14,5 @@ var options = {
 	json: false,
 };
 
-w.add(Winston.transports.DailyRotateFile, options);
+w.add(require('winston-daily-rotate-file'), options);
 w.add(Winston.transports.Console, { level: logLevel.level, colorize: true, timestamp: true });
