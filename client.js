@@ -313,7 +313,7 @@ c.timeout = function (channelname, username, time) {
 }
 
 c.say = function (channel, message) {
-	var clientObj = client.getConnForChannel(channelname);
+	var clientObj = client.getConnForChannel(channel);
 	clientObj.say(channel, message);
 }
 
