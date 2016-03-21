@@ -1,5 +1,7 @@
 "use strict";
 
+var globalConfig = require('../../config.js');
+
 var models = require('../../lib/models.js');
 var channelList = require('../../lib/channel.js').channels;
 
@@ -164,4 +166,14 @@ app.get('/:channel/counts', function(req, res){
 app.get('/:channel/game/:game', function(req, res){
 	res.locals.game = req.params.game;
 	return dumpChannelInfo(req, res);
+});
+
+app.get('/:channel/bark/:bark', function (req, res) {
+	var channel = res.locals.channel;
+	if (channel.barks.barks[req.params.bark]) {
+		channel.barks.barks[req.params.bark].doBark({ username: globalConfig.irc.userName });
+		res.send("OK");
+	} else {
+		res.send("Error");
+	}
 });
