@@ -30,8 +30,12 @@ var ircClient = function () {
     this.clientConnection.parent = this;
     this.whisperConnection = new tmi.client(this.whisper_options);
 	this.whisperConnection.parent = this;
+	/* 
+	 * And just like that, The AWS changeover is done with.
+	 * 
 	this.awsConnection = new tmi.client(this.aws_options);
-	this.awsConnection.parent = this;
+	this.awsConnection.parent = this; 
+	*/
     
     //Then we add listeners to those clients.
     this.clientConnection.on('chat', this.onChat);
@@ -43,10 +47,11 @@ var ircClient = function () {
     this.clientConnection.on('part', this.onChatPart);
     this.clientConnection.on('notice', this.onChatNotice);
 	this.clientConnection.on('roomstate', this.onRoomState);
-	this.clientConnection.on('serverchange', this.onServerChange);
+	//this.clientConnection.on('serverchange', this.onServerChange);
 	this.clientConnection.network = "Main";
     this.clientConnection.connect();    
 	
+/*	
 	this.awsConnection.on('chat', this.onChat);
 	this.awsConnection.on('mod', this.onMod);
 	this.awsConnection.on('unmod', this.onUnMod);
@@ -58,6 +63,8 @@ var ircClient = function () {
 	this.awsConnection.on('roomstate', this.onRoomState);
 	this.awsConnection.network = "AWS";
 	this.awsConnection.connect();
+
+*/
     
 
     this.whisperConnection.on('connected', this.onWhisperConnect);
@@ -85,9 +92,11 @@ c.onChatConnect = function (address, port) {
     Channel.findActiveChannels(this.parent.joinChannels, this.network);
 }
 
+/* 
 c.onAWSConnect = function (address, port) {
 	log.info(this.network,"Connected");
-}
+} 
+*/
 
 c.onRoomState = function (channel, state) {
     var channel = this.parent.channels[channel];
@@ -222,7 +231,8 @@ c.whisper_options = {
 	},
 	connection: {
 		cluster: 'group',
-		reconnect: true
+		reconnect: true,
+		secure: true
 	},
 	identity: {
 		username: config.userName,
@@ -230,6 +240,9 @@ c.whisper_options = {
 	}
 
 }
+/*
+ * AWS is no longer needed.
+ 
 c.aws_options = {
 	options: {
 		debug: false,
@@ -245,6 +258,9 @@ c.aws_options = {
 		password: token
 	}
 }
+
+*/
+ 
 c.whisperCommands = [];
 
 c.clientConnected = false;
@@ -254,7 +270,8 @@ c.quitting = false;
 
 //We store Channel objects that we pass messages to
 c.channels = {};
-c.awsChannels = {};
+
+// c.awsChannels = {};
 
 c.attachWhispers = function () {
     this.attachWhisper(commands.common);
@@ -297,12 +314,12 @@ c.whisper = function (user, channel, message) {
 
 c.getConnForChannel = function(channelName) {
 	var clientChannels = client.clientConnection.getChannels();
-	var awsChannels = client.awsConnection.getChannels();
+	// var awsChannels = client.awsConnection.getChannels();
 	if (clientChannels.indexOf(channelName) >= 0) {
 		return client.clientConnection;
-	} else if (awsChannels.indexOf(channelName) >= 0) {
+	} /* else if (awsChannels.indexOf(channelName) >= 0) {
 		return client.awsConnection;
-	} else {
+	} */ else {
 		log.error("Unable to find connection for ", channelName);
 	}
 }
@@ -395,6 +412,7 @@ c.partChannel = function (channel){
 	delete channels[channel.hashtag];
     this.parent.getConnForChannel(channel.hashtag).part(channel.hashtag);
 }
+/* 
 c.onServerChange = function (channel) {
 	var me = this.parent;
 	log.info(this.network, channel.hashtag, "Switching to AWS");
@@ -403,6 +421,7 @@ c.onServerChange = function (channel) {
 	me.clientConnection.part(channel.hashtag);
 	me.awsConnection.join(channel.hashtag);
 }
+*/
 
 var client = new ircClient();
 
