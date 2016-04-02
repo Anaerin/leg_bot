@@ -14,7 +14,10 @@ var options = {
 	colorize: false,
 	timestamp: true,
 	json: false,
+	handleExceptions: true,
+	humanReadableUnhandledException: true,
+	exitOnError: false
 };
 
 w.add(require('winston-daily-rotate-file'), options);
-w.add(Winston.transports.Console, { level: logLevel.level, colorize: true, timestamp: true });
+w.add(Winston.transports.Console, { level: logLevel.level, colorize: true, timestamp: true, handleExceptions: true, humanReadableUnhandledException: true, exitOnError: false });
