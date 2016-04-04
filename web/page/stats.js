@@ -21,7 +21,7 @@ function listGames(req, res) {
     models.sequelize.query("SELECT game, SUM(value) AS count_value FROM Counts GROUP BY game", { type: models.sequelize.QueryTypes.SELECT })
 	.then(function (counts) {
         counts.forEach(function (count) {
-            output.push({ stat: count.game, url: escape(count.game), value: count.count_value });
+            output.push({ stat: count.game, url: encodeURIComponent(count.game), value: count.count_value });
         });
         res.render('statsListing.jade', { stats: output, subpage: 'game', title: "Statistics by Game" });
     });
@@ -35,7 +35,7 @@ function listChannels(req, res) {
     models.sequelize.query("SELECT Channels.name, count(Statistics.id) AS StatsCount FROM Statistics INNER JOIN Channels ON Statistics.ChannelId = Channels.id GROUP BY ChannelId", { type: models.sequelize.QueryTypes.SELECT })
 	.then(function (channels) {
         channels.forEach(function (channel) {
-            output.push({ stat: channel.name, url: escape(channel.name), value: channel.StatsCount });
+            output.push({ stat: channel.name, url: encodeURIComponent(channel.name), value: channel.StatsCount });
         });
         res.render('statsListing.jade', { stats: output, subpage: 'channel', title: "Statistics by Channel" });
 	});
@@ -103,9 +103,9 @@ function listChannelStats(req, res) {
         var stat = statistics[i];
             statsIDs.push(stat.id);
             if (stat.CountValue == 1) {
-                stats.push({ stat: stat.name, url: escape(stat.command), value: stat.CountValue });
+                stats.push({ stat: stat.name, url: encodeURIComponent(stat.command), value: stat.CountValue });
             } else {
-                stats.push({ stat: stat.plural, url: escape(stat.command), value: stat.CountValue });
+                stats.push({ stat: stat.plural, url: encodeURIComponent(stat.command), value: stat.CountValue });
             }
         }
         models.Count.findAll({ where: { StatisticId: { $in: statsIDs } }, group: ['game'] })
