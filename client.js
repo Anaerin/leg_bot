@@ -216,8 +216,9 @@ c.options = {
 		debug: false
 	},
 	connection: {
-		cluster: 'main',
-		reconnect: true
+		cluster: 'aws',
+		reconnect: true,
+		secure: true
 	},
 	identity: {
 		username: config.userName,
