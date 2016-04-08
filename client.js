@@ -28,8 +28,11 @@ var ircClient = function () {
     //First, we need a few clients...
     this.clientConnection = new tmi.client(this.options);
     this.clientConnection.parent = this;
-    this.whisperConnection = new tmi.client(this.whisper_options);
+	/*
+	 * Whispers have moved to AWS. So no need for a separate connection anymore. Hopefully...
+	this.whisperConnection = new tmi.client(this.whisper_options);
 	this.whisperConnection.parent = this;
+	 */
 	/* 
 	 * And just like that, The AWS changeover is done with.
 	 * 
@@ -47,6 +50,7 @@ var ircClient = function () {
     this.clientConnection.on('part', this.onChatPart);
     this.clientConnection.on('notice', this.onChatNotice);
 	this.clientConnection.on('roomstate', this.onRoomState);
+	this.clientConnection.on('whisper', this.onWhisper);
 	//this.clientConnection.on('serverchange', this.onServerChange);
 	this.clientConnection.network = "Main";
     this.clientConnection.connect();    
@@ -66,13 +70,13 @@ var ircClient = function () {
 
 */
     
-
+/*
     this.whisperConnection.on('connected', this.onWhisperConnect);
     this.whisperConnection.on('disconnected', this.onWhisperDisconnect);
     this.whisperConnection.on('notice', this.onWhisperNotice);
     this.whisperConnection.on('whisper', this.onWhisper);
     this.whisperConnection.connect();
-
+*/
     //Then we attach whisper handlers directly.
     this.attachWhispers();
 	this.lastUpdated = new Date().valueOf();
@@ -83,7 +87,7 @@ c.lastWhisper = {};
 
 c.disconnect = function () {
     this.clientConnection.disconnect();
-    this.whisperConnection.disconnect();
+    //this.whisperConnection.disconnect();
 }
 
 c.onChatConnect = function (address, port) {
@@ -129,7 +133,7 @@ c.onUnMod = function (channel, user) {
 c.onChatDisconnect = function (reason) {
     client.clientConnected = false;
     log.warn(this.network, "Chat channel disconnected: ", reason);
-    if (this.parent.quitting && !whisperconnConnected) {
+    if (this.parent.quitting /* && !whisperconnConnected */) {
         process.exit();
     }
 }
@@ -151,13 +155,19 @@ c.onChatPart = function (channel, user) {
 
 c.onChatNotice = function (channel, msgid, message) {
     switch (msgid) {
-        default:
+		case "whisper_restricted_recipient":
+			log.warn("Restricted whisper message. Channel ", channel, ", id ", msgid, ", message ", message);
+			this.parent.replayWhisper(true);
+			break;
+		default:
             log.info(this.network,"Chat connection notice: ", channel, " - ", msgid, " (", message, ")");
             break;
     }
 }
 
-c.onWhisperConnect = function (address, port) {
+/* Whispers on AWS. No need for separate connection anymore.
+ * 
+ c.onWhisperConnect = function (address, port) {
     client.whisperconnConnected = true;
     log.info("Whisper channel connected");
 }
@@ -185,12 +195,12 @@ c.onWhisperNotice = function (channel, msgid, message) {
             break;
     }
 }
-
+*/
 c.onWhisper = function (user, message) {
     //We got a whisper. Do something with it.
     log.info("Whisper received:", user, " - ", message);
     //Update the Last Seen table...
-    client.updateLastSeen(user, null);    
+    client.updateLastSeen(user.username, false);    
     if (message[0] != '!') return;
     
     this.log.info("W:", user['display-name'], "M:", message);
@@ -204,7 +214,11 @@ c.onWhisper = function (user, message) {
 c.updateLastSeen = function (user, channelID) {
     models.LastSeen.findOrCreate({ where: { name: user }, defaults: { dateTimeSeen: Date.now() } }).spread(function (foundUser) {
         foundUser.dateTimeSeen = Date.now();
-        foundUser.ChannelId = channelID;
+		if (channelID) {
+			foundUser.ChannelId = channelID;
+		} else {
+			foundUser.ChannelId = null;
+		}
         foundUser.save();
     });
 }
@@ -225,6 +239,8 @@ c.options = {
 		password: token
 	}
 };
+/* Whisper's on AWS, which is now main. I know, it's confusing.
+ * 
 c.whisper_options = {
 	options: {
 		debug: false,
@@ -241,6 +257,8 @@ c.whisper_options = {
 	}
 
 }
+ */
+
 /*
  * AWS is no longer needed.
  
@@ -265,7 +283,7 @@ c.aws_options = {
 c.whisperCommands = [];
 
 c.clientConnected = false;
-c.whisperconnConnected = false;
+//c.whisperconnConnected = false;
 
 c.quitting = false;
 
@@ -303,14 +321,14 @@ c.whisper = function (user, channel, message) {
 		channel: channel,
 		message: message
 	};
-	if (client.whisperconnConnected) {
+	//if (client.whisperconnConnected) {
 		//If we can send a whisper...
 		log.info("Whispering to ", username , ": ", message);
-		client.whisperConnection.whisper(username, message);
-	} else {
+		client.clientConnection.whisper(username, message);
+	//} else {
 		//Otherwise use the fallback method of spamming chat.
-		client.replayWhisper(false);
-	}
+	// client.replayWhisper(false);
+	//}
 }
 
 c.getConnForChannel = function(channelName) {
