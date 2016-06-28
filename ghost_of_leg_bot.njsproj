@@ -16,18 +16,26 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Compile Include="lib\commands\quotes.js" />
+    <Compile Include="web\static\qdb.js" />
+    <Compile Include="web\websocket\index.js" />
+    <Content Include="package.json" />
     <Content Include="README.md" />
     <Compile Include="client.js" />
     <Compile Include="config.js" />
     <Compile Include="legbot.js" />
     <Compile Include="lib\antispam.js" />
-    <Compile Include="lib\commands\antispam.js" />
+    <Compile Include="lib\commands\antispamadmin.js" />
+    <Compile Include="lib\commands\joinpart.js" />
+    <Compile Include="lib\commands\barks.js" />
+    <Compile Include="lib\commands\seen.js" />
     <Compile Include="log.js" />
     <Compile Include="otherchannels.js" />
     <Compile Include="lib\channel.js" />
     <Compile Include="lib\google_calendar.js" />
     <Compile Include="lib\models.js" />
     <Compile Include="lib\twitch.js" />
+    <Compile Include="web\api\advice.js" />
     <Compile Include="web\index.js" />
     <Compile Include="lib\commands\advice.js" />
     <Compile Include="lib\commands\calendar.js" />
@@ -42,15 +50,28 @@
     <Compile Include="web\api\live.js" />
     <Compile Include="web\page\index.js" />
     <Compile Include="web\page\live.js" />
+    <Compile Include="web\page\advice.js" />
     <Compile Include="web\page\stats.js" />
     <Content Include="web\static\dickbutt.txt" />
     <Content Include="web\static\apirefresher.html" />
     <Content Include="web\static\style.css" />
+    <Compile Include="web\static\advice.js" />
     <Compile Include="web\static\live.js" />
     <Content Include="web\views\footer.jade" />
     <Content Include="web\views\header.jade" />
+    <Content Include="web\views\heading.jade" />
     <Content Include="web\views\index.jade" />
+    <Content Include="web\views\advice.jade" />
     <Content Include="web\views\live.jade" />
+    <Content Include="web\views\preprocess.jade" />
+    <Content Include="web\views\stats.jade" />
+    <Content Include="web\views\statsChannel.jade" />
+    <Content Include="web\views\statsChannelGame.jade" />
+    <Content Include="web\views\statsGame.jade" />
+    <Content Include="web\views\statsListing.jade" />
+    <Content Include="web\views\statsChannelCommand.jade" />
+    <Content Include="web\views\statsSubmenu.jade" />
+    <Content Include="web\websocket\wsreceiver.htm" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="lib" />
@@ -58,6 +79,7 @@
     <Folder Include="logs" />
     <Folder Include="web" />
     <Folder Include="web\api" />
+    <Folder Include="web\websocket\" />
     <Folder Include="web\page" />
     <Folder Include="web\static" />
     <Folder Include="web\views" />

@@ -14,7 +14,7 @@ mw.use(function(req, res, next) {
 
 mw.use('/channel', require('./channel.js'));
 mw.use('/advice', require('./advice.js'));
-
+mw.use('/qdb', require('./qdb.js'));
 mw.get('/', function(req, res){
 	res.send("Only scrubs skip API params.");
 });

@@ -1,0 +1,37 @@
+{
+  "name": "leg_bot",
+  "version": "1.0",
+  "description": "A Twitch bot for handling statistics, live monitoring, calendars and more",
+  "homepage": "http://anaerins.blogspot.ca/2015/07/legbot.html",
+  "repository": "Anaerin/leg_bot",
+  "license": "BSD-3-Clause-Attribution",
+  "author": {
+    "name": "Robert Johnston",
+    "email": "anaerin@gmail.com",
+    "url": "http://anaerins.blogspot.ca"
+  },
+  "contributors": [
+    {
+      "name": "Urmas Lamster",
+      "email": "urmasl@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "compression": "",
+    "connect-session-sequelize": "^3.0.0",
+    "express": "^4.14.0",
+    "express-session": "^1.13.0",
+    "express-ws": "^2.0.0-rc.1",
+    "jade": "",
+    "moment": "^2.13.0",
+    "moment-timezone": "^0.5.4",
+    "roll": "",
+    "sequelize": "^3.23.4",
+    "serve-static": "^1.11.1",
+    "sqlite3": "^3.1.4",
+    "tmi.js": "",
+    "winston": "^2.2.0",
+    "winston-child": "^1.0.0",
+    "winston-daily-rotate-file": "^1.1.4"
+  }
+}

@@ -1,11 +1,15 @@
 module.exports = {
 	irc: {
-		userName: 'Ghost_of_Leg_Bot',
-        //userName: 'iamhumannotabot', //Strictly for testing porpoises.
+		//userName: 'Ghost_of_Leg_Bot',
+        userName: 'iamhumannotabot', //Strictly for testing porpoises.
 	},
 
 	db: {
-		file: './legbot.sqlite',
+        DBType: 'sqlite',
+        DBHost: 'localhost',
+        DBUsername: 'ghost_of_leg_bot',
+        DBPassword: 'Sir? Sir! Plain Text Passwords Are Bad!',
+        file: './legbot.sqlite',
 	},
 	channel: {
 		//How long we keep an users mod status after twitch revokes it
@@ -15,12 +19,13 @@ module.exports = {
 
 	twitchAPI: {
 		//Where we can find the api
-		hostname: "api.twitch.tv",
-		path: "/kraken/streams?channel=%channels%",
+		path: "https://api.twitch.tv/kraken/streams?channel=%channels%",
 		//How often we DO query twitch's API in milliseconds
 		interval: 90 * 1000,
 		//Channels without leg_bot that we care about.
-		otherChannels: require('./otherchannels.js')
+		otherChannels: require('./otherchannels.js'),
+		clientID: require('./secrets.js').twitchClientID,
+		oAuth: require('./secrets.js').twitchToken.replace('oauth:','OAuth ')
 	},
 
 
@@ -38,5 +43,9 @@ module.exports = {
 
 	web: {
 		port: 3000,
-	}
+    },
+
+    logging: {
+        level: 'debug'
+    }
 }

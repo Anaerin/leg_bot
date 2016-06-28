@@ -151,6 +151,44 @@ table.adviceTable td.voteButtons {
     text-align: center;
     padding: 0;
 }
+
+table.qdbTable {
+    width: 100%;
+    padding: 0;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+table.qdbTable tr {
+    padding: 0;
+    margin: 0;
+}
+table.qdbTable td {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 0;
+}
+table.qdbTable th {
+    border: 1px solid black;
+    border-top: none;
+    padding: 5px;
+    margin: 0;
+}
+table.qdbTable td:first-child  {
+    border-left: none;
+    text-align: right;
+}
+table.qdbTable th:first-child {
+    border-left: none;
+}
+table.qdbTable th:last-child, table.qdbTable td:last-child {
+    border-left: none;
+    border-right: none;
+}
+
+table.qdbTable tr:last-child td {
+    border-bottom: none;
+}
+
 a.voting:hover {
     background-color: #bbbbbb;
     cursor: pointer;

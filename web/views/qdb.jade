@@ -1,0 +1,14 @@
+include ./preprocess.jade
+doctype html
+html
+	head
+		include ./header.jade
+	body
+		include ./heading.jade
+		p.
+			Here's all the quotes we have.
+		div#advices
+		script(
+			src='/static/qdb.js'
+			type='text/javascript'
+		)

@@ -1,0 +1,136 @@
+{
+  "spam_rules": [
+    {
+      "name": "porn spam - naked",
+      "regularExpression": "naked-?(\\w+)\\.com/\\?ref="
+    },
+    {
+      "name": "porn spam - miss",
+      "regularExpression": "http://miss-?(\\w+)\\.com/\\?id="
+    },
+    {
+      "name": "Vine spam",
+      "regularExpression": "vine4you\\.com"
+    },
+    {
+      "name": "have to watch this",
+      "regularExpression": "^(?:you[_\\s]*(?:have[_\\s]*to|need[_\\s]*to|must|won'?t[_\\s]*regret[_\\s]*to|should|can't[_\\s]*miss|better))?[_\\s]*(?:open|open[_\\s]*up|watch|see|look[_\\s]*up|check[_\\s]*out|browse)[_\\s]*(?:tiny\\.tw|tinyurl\\.com|goo\\.gl|qr\\.net|0rz\\.tw|7\\.ly|bit\\.ly|tr\\.im|bit\\.do|x\\.co|2tu\\.us|2\\.gp|chilp\\.it|alturl\\.com|is\\.gd|u\\.to|adf\\.ly|clck\\.ru|ity\\.im|cutt\\.us)/[_\\S]+[_\\s]*(?:very[_\\s]*funny|I[_\\s]*lol'd|I[_\\s]*laughed[_\\s]*so[_\\s]*hard[_\\s]*I[_\\s]*pooped[_\\s]*a[_\\s]*little|better[_\\s]*than[_\\s]*games|so[_\\s]*funny|too[_\\s]*funny|I[_\\s]*nearly[_\\s]*died[_\\s]*because[_\\s]*of[_\\s]*the[_\\s]*laughing|must[_\\s]*see|such[_\\s]*funny,[_\\s]*very[_\\s]*joke|I[_\\s]*cannot[_\\s]*breathe|better[_\\s]*than[_\\s]*games)?[_\\s]*(?:XD|XDXD|X'D|haha|HAHA|rofl|ROFL|:D|:D:D|lol|LOL)?$"
+    },
+    {
+      "name": "microartist",
+      "regularExpression": "http://microartist\\.org"
+    },
+    {
+      "name": "adfly links",
+      "regularExpression": "adf\\.ly/\\S+"
+    },
+    {
+      "name": "codes4free",
+      "regularExpression": "codes4free\\.net"
+    },
+    {
+      "name": "steam-cards",
+      "regularExpression": "steam-cards\\.com"
+    },
+    {
+      "name": "feedeep",
+      "regularExpression": "feedeep\\.com"
+    },
+    {
+      "name": "steamcode",
+      "regularExpression": "http://steamcode\\.org/\\?ref="
+    },
+    {
+      "name": "TinyLinks",
+      "regularExpression": "tinylinks\\.co/\\S+"
+    },
+    {
+      "name": "clownsong",
+      "regularExpression": "clownsong\\.com"
+    },
+    {
+      "name": "topstreamers",
+      "regularExpression": "top\\W*streamers\\W*(?:dot)?\\W*com"
+    },
+    {
+      "name": "imgur spam links",
+      "regularExpression": "http://imgur\\. com/\\S+"
+    },
+    {
+      "name": "box drawing or block elements",
+      "regularExpression": "[\\u2500-\\u259F]{5}"
+    },
+    {
+      "name": "G2A referral",
+      "regularExpression": "Buy games for cheap, or earn money with them!"
+    },
+    {
+      "name": "mtgbot",
+      "regularExpression": "BloodTrail Boros fist bump to you! Todays Storm Count:"
+    },
+    {
+      "name": "steampromo",
+      "regularExpression": "steam-promo\\.com/\\?click="
+    },
+    {
+      "name": "j.mp spam",
+      "regularExpression": "j\\.mp/\\S+"
+    },
+    {
+      "name": "smitepromotions",
+      "regularExpression": "smitepromotions\\.com/\\S+"
+    },
+    {
+      "name": "Po.gl Spam",
+      "regularExpression": "po\\.gl/\\S+"
+    },
+    {
+      "name": "G2A Spam",
+      "regularExpression": "g2a\\.com/\\S+"
+    },
+    {
+      "name": "championship riven skin code",
+      "regularExpression": "https://www\\.youtube\\.com/watch\\?v=lV07LJEW3UA"
+    },
+    {
+      "name": "RAF2",
+      "regularExpression": "Get .Medieval.Twitch, Grey.Warwick and 5.000.IP from Riots .Refer.A.Friend on .RAF2.com"
+    },
+    {
+      "name": "Screamer",
+      "regularExpression": "strawpoIl\\.me/\\S+"
+    },
+    {
+      "name": "apo.af",
+      "regularExpression": "apo.af/\\S+"
+    },
+    {
+      "name": "gamepts.com",
+      "regularExpression": "gamepts\\.com/\\S+"
+    },
+    {
+      "name": "us.af spam",
+      "regularExpression": "us\\.af/\\S+"
+    },
+    {
+      "name": "No song requests",
+      "regularExpression": "!songrequest"
+    },
+    {
+      "name": "Link shorteners",
+      "regularExpression": "bit\\.ly"
+    },
+    {
+      "name": "Asian Chicks Spam",
+      "regularExpression": "For Asian guys, have you seen the Asian Gamer Chicks subreddit?"
+    },
+    {
+      "name": "goldmine",
+      "regularExpression": "why don't you put a banner for goldmine\\? \\(http://goo\\.gl/\\S+\\)"
+    },
+    {
+      "name": "gyazo spam",
+      "regularExpression": "gyazo\\.name/"
+    }
+  ]
+}

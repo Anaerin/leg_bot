@@ -18,13 +18,12 @@ var commands = require('./lib/commands');
 
 var models = require('./lib/models.js');
 
+var twitch = require('./lib/twitch.js');
+
 //We setup the options object and import the oauth token.
 var token = require('./secrets.js').twitchToken;
 
 var ircClient = function () {
-    if (client) return client;
-    // Let's make ourselves an object...
-
     //First, we need a few clients...
     this.clientConnection = new tmi.client(this.options);
     this.clientConnection.parent = this;
@@ -415,6 +414,9 @@ c.joinChannel = function(channel){
 		client.channels[channel.hashtag] = channel;
 		client.clientConnection.join(channel.hashtag);
         channel.client = client;
+	} else {
+		//We don't want to join, but this is an "Interesting" channel. So monitor it.
+		twitch.addChannel(channel);
 	}
 }
 
