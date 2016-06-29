@@ -124,13 +124,17 @@ function listChannelStat(req, res) {
     var channel = res.locals.channel;
     models.Statistic.findOne({ where: { ChannelId: channel.model.id, command: req.params.command } })
     .then(function (statistics) {
-        models.Count.findAll({ where: { StatisticId: statistics.id } })
-        .then(function (counts) {
-            counts.forEach(function (count) {
-                output.push({ game: count.game, total: count.value });
-            });
-            res.render('statsChannelCommand.jade', { stats: output, name: channel.model.name, command: req.params.command, single: statistics.name, plural: statistics.plural });
-        });
+        if (statistics.id) {
+            models.Count.findAll({ where: { StatisticId: statistics.id } })
+                .then(function (counts) {
+                    counts.forEach(function (count) {
+                        output.push({ game: count.game, total: count.value });
+                    });
+                    res.render('statsChannelCommand.jade', { stats: output, name: channel.model.name, command: req.params.command, single: statistics.name, plural: statistics.plural });
+                });
+        } else {
+            log.warn("Unable to find stats for channel/stat", channel.model.name, req.params.command);
+        }
     });
 }
 
