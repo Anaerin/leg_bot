@@ -195,7 +195,7 @@ c.onWhisperNotice = function (channel, msgid, message) {
     }
 }
 */
-c.onWhisper = function (user, message) {
+c.onWhisper = function (from, user, message, fromSelf) {
     //We got a whisper. Do something with it.
     log.info("Whisper received:", user, " - ", message);
     //Update the Last Seen table...

@@ -77,12 +77,19 @@
     <Folder Include="lib" />
     <Folder Include="lib\commands" />
     <Folder Include="logs" />
+    <Folder Include="typings\" />
+    <Folder Include="typings\globals\" />
+    <Folder Include="typings\globals\node\" />
     <Folder Include="web" />
     <Folder Include="web\api" />
     <Folder Include="web\websocket\" />
     <Folder Include="web\page" />
     <Folder Include="web\static" />
     <Folder Include="web\views" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="typings\globals\node\index.d.ts" />
+    <TypeScriptCompile Include="typings\index.d.ts" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->

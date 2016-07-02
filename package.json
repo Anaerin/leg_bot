@@ -1,6 +1,6 @@
 {
   "name": "leg_bot",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "A Twitch bot for handling statistics, live monitoring, calendars and more",
   "homepage": "http://anaerins.blogspot.ca/2015/07/legbot.html",
   "repository": "Anaerin/leg_bot",
@@ -29,7 +29,7 @@
     "sequelize": "^3.23.4",
     "serve-static": "^1.11.1",
     "sqlite3": "^3.1.4",
-    "tmi.js": "",
+    "tmi.js": "^1.1.1",
     "winston": "^2.2.0",
     "winston-child": "^1.0.0",
     "winston-daily-rotate-file": "^1.1.4"
