@@ -25,7 +25,8 @@ module.exports = {
 		//Channels without leg_bot that we care about.
 		otherChannels: require('./otherchannels.js'),
 		clientID: require('./secrets.js').twitchClientID,
-		oAuth: require('./secrets.js').twitchToken.replace('oauth:','OAuth ')
+		clientSecret: require('./secrets.js').twitchClientSecret,
+		clientRedirectURL: require('./secrets.js').twitchRedirectURL
 	},
 
 

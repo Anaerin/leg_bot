@@ -22,7 +22,7 @@ var log = require('../log.js');
 var fs = require('fs');
 
 app.use('/api', require('./api'));
-
+app.use('/oauth', require('./oauth'));
 var serveStatic = require('serve-static');
 app.use('/static', serveStatic('./web/static'));
 

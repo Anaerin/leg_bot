@@ -20,73 +20,55 @@ var models = require('./lib/models.js');
 
 var twitch = require('./lib/twitch.js');
 
+var settings = require('./lib/settings.js');
+
 //We setup the options object and import the oauth token.
-var token = require('./secrets.js').twitchToken;
+var secrets = require('./secrets.js');
 
 var ircClient = function () {
-    //First, we need a few clients...
-    this.clientConnection = new tmi.client(this.options);
-    this.clientConnection.parent = this;
-	/*
-	 * Whispers have moved to AWS. So no need for a separate connection anymore. Hopefully...
-	this.whisperConnection = new tmi.client(this.whisper_options);
-	this.whisperConnection.parent = this;
-	 */
-	/* 
-	 * And just like that, The AWS changeover is done with.
-	 * 
-	this.awsConnection = new tmi.client(this.aws_options);
-	this.awsConnection.parent = this; 
-	*/
-    
-    //Then we add listeners to those clients.
-    this.clientConnection.on('chat', this.onChat);
-    this.clientConnection.on('mod', this.onMod);
-    this.clientConnection.on('unmod', this.onUnMod);
-    this.clientConnection.on('connected', this.onChatConnect);
-    this.clientConnection.on('disconnected', this.onChatDisconnect);
-    this.clientConnection.on('join', this.onChatJoin);
-    this.clientConnection.on('part', this.onChatPart);
-    this.clientConnection.on('notice', this.onChatNotice);
+	this.lastWhisper = {};
+	this.whisperCommands = [];
+
+	this.clientConnected = false;
+
+	this.quitting = false;
+
+	//We store Channel objects that we pass messages to
+	this.channels = {};
+
+	twitch.client = this;
+}
+
+var c = ircClient.prototype;
+
+c.connect = function (options) {
+	//First, we need a few clients...
+	this.options = options;
+	this.clientConnection = new tmi.client(this.options);
+	this.clientConnection.parent = this;
+	
+	//Then we add listeners to those clients.
+	this.clientConnection.on('chat', this.onChat);
+	this.clientConnection.on('mod', this.onMod);
+	this.clientConnection.on('unmod', this.onUnMod);
+	this.clientConnection.on('connected', this.onChatConnect);
+	this.clientConnection.on('disconnected', this.onChatDisconnect);
+	this.clientConnection.on('join', this.onChatJoin);
+	this.clientConnection.on('part', this.onChatPart);
+	this.clientConnection.on('notice', this.onChatNotice);
 	this.clientConnection.on('roomstate', this.onRoomState);
 	this.clientConnection.on('whisper', this.onWhisper);
 	//this.clientConnection.on('serverchange', this.onServerChange);
 	this.clientConnection.network = "Main";
-    this.clientConnection.connect();    
-	
-/*	
-	this.awsConnection.on('chat', this.onChat);
-	this.awsConnection.on('mod', this.onMod);
-	this.awsConnection.on('unmod', this.onUnMod);
-	this.awsConnection.on('connected', this.onAWSConnect);
-	this.awsConnection.on('disconnected', this.onChatDisconnect);
-	this.awsConnection.on('join', this.onChatJoin);
-	this.awsConnection.on('part', this.onChatPart);
-	this.awsConnection.on('notice', this.onChatNotice);
-	this.awsConnection.on('roomstate', this.onRoomState);
-	this.awsConnection.network = "AWS";
-	this.awsConnection.connect();
+	this.clientConnection.connect();
 
-*/
-    
-/*
-    this.whisperConnection.on('connected', this.onWhisperConnect);
-    this.whisperConnection.on('disconnected', this.onWhisperDisconnect);
-    this.whisperConnection.on('notice', this.onWhisperNotice);
-    this.whisperConnection.on('whisper', this.onWhisper);
-    this.whisperConnection.connect();
-*/
-    //Then we attach whisper handlers directly.
-    this.attachWhispers();
+	//Then we attach whisper handlers directly.
+	this.attachWhispers();
 	this.lastUpdated = new Date().valueOf();
 }
 
-var c = ircClient.prototype;
-c.lastWhisper = {};
-
 c.disconnect = function () {
     this.clientConnection.disconnect();
-    //this.whisperConnection.disconnect();
 }
 
 c.onChatConnect = function (address, port) {
@@ -94,12 +76,6 @@ c.onChatConnect = function (address, port) {
 	log.info(this.network,"Connected");
     Channel.findActiveChannels(this.parent.joinChannels, this.network);
 }
-
-/* 
-c.onAWSConnect = function (address, port) {
-	log.info(this.network,"Connected");
-} 
-*/
 
 c.onRoomState = function (channel, state) {
     var channel = this.parent.channels[channel];
@@ -164,37 +140,6 @@ c.onChatNotice = function (channel, msgid, message) {
     }
 }
 
-/* Whispers on AWS. No need for separate connection anymore.
- * 
- c.onWhisperConnect = function (address, port) {
-    client.whisperconnConnected = true;
-    log.info("Whisper channel connected");
-}
-
-c.onWhisperDisconnect = function (reason) {
-    client.whisperconnConnected = false;
-    log.warn("Whisper channel disconnected:", reason);
-    if (reason == "Unable to connect.") {
-        log.info("Attempting to reconnect...");
-        this.connect();
-    }
-    if (this.parent.quitting && !this.parent.clientConnected) {
-        process.exit();
-    }
-}
-
-c.onWhisperNotice = function (channel, msgid, message) {
-    switch (msgid) {
-        case "whisper_restricted_recipient":
-            log.warn("Restricted whisper message. Channel ", channel, ", id ", msgid, ", message ", message);
-            this.parent.replayWhisper(true);
-            break;
-        default:
-            log.info("Whisper connection notice received: ", channel, " - ", msgid);
-            break;
-    }
-}
-*/
 c.onWhisper = function (from, user, message, fromSelf) {
     //We got a whisper. Do something with it.
     log.info("Whisper received:", user, " - ", message);
@@ -222,74 +167,6 @@ c.updateLastSeen = function (user, channelID) {
     });
 }
 
-
-c.options = {
-	options: {
-		logger: log,
-		debug: false
-	},
-	connection: {
-		cluster: 'aws',
-		reconnect: true,
-		secure: true
-	},
-	identity: {
-		username: config.userName,
-		password: token
-	}
-};
-/* Whisper's on AWS, which is now main. I know, it's confusing.
- * 
-c.whisper_options = {
-	options: {
-		debug: false,
-		logger: log
-	},
-	connection: {
-		cluster: 'group',
-		reconnect: true,
-		secure: true
-	},
-	identity: {
-		username: config.userName,
-		password: token
-	}
-
-}
- */
-
-/*
- * AWS is no longer needed.
- 
-c.aws_options = {
-	options: {
-		debug: false,
-		logger: log
-	},
-	connection: {
-		cluster: 'aws',
-		reconnect: true,
-		secure: true
-	},
-	identity: {
-		username: config.userName,
-		password: token
-	}
-}
-
-*/
- 
-c.whisperCommands = [];
-
-c.clientConnected = false;
-//c.whisperconnConnected = false;
-
-c.quitting = false;
-
-//We store Channel objects that we pass messages to
-c.channels = {};
-
-// c.awsChannels = {};
 
 c.attachWhispers = function () {
     this.attachWhisper(commands.common);
@@ -320,24 +197,15 @@ c.whisper = function (user, channel, message) {
 		channel: channel,
 		message: message
 	};
-	//if (client.whisperconnConnected) {
-		//If we can send a whisper...
-		log.info("Whispering to ", username , ": ", message);
-		client.clientConnection.whisper(username, message);
-	//} else {
-		//Otherwise use the fallback method of spamming chat.
-	// client.replayWhisper(false);
-	//}
+	log.info("Whispering to ", username , ": ", message);
+	client.clientConnection.whisper(username, message);
 }
 
 c.getConnForChannel = function(channelName) {
 	var clientChannels = client.clientConnection.getChannels();
-	// var awsChannels = client.awsConnection.getChannels();
 	if (clientChannels.indexOf(channelName) >= 0) {
 		return client.clientConnection;
-	} /* else if (awsChannels.indexOf(channelName) >= 0) {
-		return client.awsConnection;
-	} */ else {
+	} else {
 		log.error("Unable to find connection for ", channelName);
 	}
 }
@@ -433,16 +301,6 @@ c.partChannel = function (channel){
 	delete channels[channel.hashtag];
     this.parent.getConnForChannel(channel.hashtag).part(channel.hashtag);
 }
-/* 
-c.onServerChange = function (channel) {
-	var me = this.parent;
-	log.info(this.network, channel.hashtag, "Switching to AWS");
-	channel.network = "AWS";
-	channel.bindLog();
-	me.clientConnection.part(channel.hashtag);
-	me.awsConnection.join(channel.hashtag);
-}
-*/
 
 var client = new ircClient();
 
