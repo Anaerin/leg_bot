@@ -282,9 +282,11 @@ c.joinChannel = function(channel){
 		client.channels[channel.hashtag] = channel;
 		client.clientConnection.join(channel.hashtag);
         channel.client = client;
-	} else {
+	//} else {
 		//We don't want to join, but this is an "Interesting" channel. So monitor it.
-		twitch.addFollow(channel);
+		//
+		//We don't need to worry about this anymore - They've all been imported.
+		//twitch.addFollow(channel.model.name);
 	}
 }
 
