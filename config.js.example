@@ -1,0 +1,43 @@
+module.exports = {
+	db: {
+        DBType: 'sqlite', // sqlite or mysql
+        DBHost: 'localhost', // used for mysql, ignored for sqlite
+        DBUsername: 'loginaswhom', // used for mysql, ignored for sqlite
+        DBPassword: 'your password here', // used for mysql, ignored for sqlite
+        file: './legbot.sqlite', // used for sqlite, ignored for mysql.
+	},
+	channel: {
+		//How long we keep an users mod status after twitch revokes it
+		//(Twitch grants and revokes mod status all the time)
+		modTimeout: 30 * 60 * 60 * 1000, 
+	},
+
+	twitchAPI: {
+		//How often we DO query twitch's API in milliseconds
+		interval: 90 * 1000,
+		//Get the details from the secrets file. Example of which is in secrets.js.example.
+		clientID: require('./secrets.js').twitchClientID,
+		clientSecret: require('./secrets.js').twitchClientSecret,
+		clientRedirectURL: require('./secrets.js').twitchRedirectURL
+	},
+
+
+	gCal: {
+		url: "https://www.googleapis.com/calendar/v3/calendars/%calendar%/events",
+		params: "?key=%key%&maxResults=15&orderBy=startTime&singleEvents=true&timeMin=%after%&timeZone=Etc/UTC",
+		interval: 15 * 60 * 1000,
+		timeZone: 'America/Vancouver', // or any other linux-like timezone.
+		displayFormat: 'ddd hh:mm A z',
+		calendars: {
+			'example': "example@gmail.com"
+		},
+	},
+
+	web: {
+		port: 3000, // Or, y'know, 80 if you're pushing to production.
+    },
+
+    logging: {
+        level: 'warn' // Log levels available: error, warn, info, debug
+    }
+}

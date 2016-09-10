@@ -16,6 +16,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Compile Include="config.js.example" />
     <Compile Include="lib\commands\quotes.js" />
     <Compile Include="lib\settings.js" />
     <Compile Include="web\oauth\index.js" />
@@ -53,6 +54,7 @@
     <Compile Include="web\page\live.js" />
     <Compile Include="web\page\advice.js" />
     <Compile Include="web\page\stats.js" />
+    <Content Include="secrets.js.example" />
     <Content Include="web\static\dickbutt.txt" />
     <Content Include="web\static\apirefresher.html" />
     <Content Include="web\static\style.css" />
