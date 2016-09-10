@@ -159,9 +159,9 @@ c.updateLastSeen = function (user, channelName) {
     models.LastSeen.findOrCreate({ where: { name: user }, defaults: { dateTimeSeen: Date.now() } }).spread(function (foundUser) {
         foundUser.dateTimeSeen = Date.now();
 		if (channelName) {
-			foundUser.where = channelName;
+			foundUser.whereSeen = channelName;
 		} else {
-			foundUser.where = null;
+			foundUser.whereSeen = null;
 		}
         foundUser.save();
     });
