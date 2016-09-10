@@ -203,11 +203,11 @@ c.whisper = function (user, channel, message) {
 
 c.getConnForChannel = function(channelName) {
 	var clientChannels = client.clientConnection.getChannels();
-	if (clientChannels.indexOf(channelName) >= 0) {
+	//if (clientChannels.indexOf(channelName) >= 0) {
 		return client.clientConnection;
-	} else {
-		log.error("Unable to find connection for ", channelName);
-	}
+	//} else {
+		//log.error("Unable to find connection for ", channelName);
+	//}
 }
 
 c.timeout = function (channelname, username, time) {
