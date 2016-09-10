@@ -1,9 +1,4 @@
 module.exports = {
-	irc: {
-		//userName: 'Ghost_of_Leg_Bot',
-        userName: 'iamhumannotabot', //Strictly for testing porpoises.
-	},
-
 	db: {
         DBType: 'sqlite',
         DBHost: 'localhost',
@@ -18,12 +13,8 @@ module.exports = {
 	},
 
 	twitchAPI: {
-		//Where we can find the api
-		path: "https://api.twitch.tv/kraken/streams?channel=%channels%",
 		//How often we DO query twitch's API in milliseconds
 		interval: 90 * 1000,
-		//Channels without leg_bot that we care about.
-		otherChannels: require('./otherchannels.js'),
 		clientID: require('./secrets.js').twitchClientID,
 		clientSecret: require('./secrets.js').twitchClientSecret,
 		clientRedirectURL: require('./secrets.js').twitchRedirectURL

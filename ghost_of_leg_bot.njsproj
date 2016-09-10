@@ -32,7 +32,6 @@
     <Compile Include="lib\commands\barks.js" />
     <Compile Include="lib\commands\seen.js" />
     <Compile Include="log.js" />
-    <Compile Include="otherchannels.js" />
     <Compile Include="lib\channel.js" />
     <Compile Include="lib\google_calendar.js" />
     <Compile Include="lib\models.js" />

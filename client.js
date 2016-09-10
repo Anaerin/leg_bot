@@ -284,7 +284,7 @@ c.joinChannel = function(channel){
         channel.client = client;
 	} else {
 		//We don't want to join, but this is an "Interesting" channel. So monitor it.
-		twitch.addChannel(channel);
+		twitch.addFollow(channel);
 	}
 }
 

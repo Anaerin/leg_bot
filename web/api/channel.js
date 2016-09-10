@@ -7,6 +7,8 @@ var channelList = require('../../lib/channel.js').channels;
 
 var log = require('../../log.js');
 
+var settings = require('../../lib/settings.js');
+
 var express = require('express');
 var app = module.exports = new express.Router({mergeParams: true});
 
@@ -171,7 +173,7 @@ app.get('/:channel/game/:game', function(req, res){
 app.get('/:channel/bark/:bark', function (req, res) {
 	var channel = res.locals.channel;
 	if (channel.barks.barks[req.params.bark]) {
-		channel.barks.barks[req.params.bark].doBark({ username: globalConfig.irc.userName });
+		channel.barks.barks[req.params.bark].doBark({ username: settings.user_name });
 		res.send("OK");
 	} else {
 		res.send("Error");
