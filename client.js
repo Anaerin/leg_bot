@@ -92,7 +92,7 @@ c.onChat = function (channel, user, message, self) {
     channel.users[user] = user;
     channel.onMessage(user, message);
     //Update the Last Seen table...
-    client.updateLastSeen(user.username, channel.model.id);
+    client.updateLastSeen(user.username, channel.model.name);
 };
 
 c.onMod = function (channel, user) {
@@ -155,13 +155,13 @@ c.onWhisper = function (from, user, message, fromSelf) {
  
 }
 
-c.updateLastSeen = function (user, channelID) {
+c.updateLastSeen = function (user, channelName) {
     models.LastSeen.findOrCreate({ where: { name: user }, defaults: { dateTimeSeen: Date.now() } }).spread(function (foundUser) {
         foundUser.dateTimeSeen = Date.now();
-		if (channelID) {
-			foundUser.ChannelId = channelID;
+		if (channelName) {
+			foundUser.where = channelName;
 		} else {
-			foundUser.ChannelId = null;
+			foundUser.where = null;
 		}
         foundUser.save();
     });
