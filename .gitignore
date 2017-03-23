@@ -11,3 +11,4 @@ db_backups
 *.suo
 legbot.sqlite
 legbot.sqlite
+/obj/Debug/CoreCompileInputs.cache

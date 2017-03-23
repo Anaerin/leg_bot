@@ -26,7 +26,8 @@ function attachChannel(ws, req, next) {
         ws.on('message', function () {
             //We don't care;
         });
-        channel.websockets.push(ws);
+		channel.websockets.push(ws);
+		channel.newWebSocket(ws);
     }
     log.info("Set up socket. Moving on.");
     next();

@@ -12,8 +12,6 @@ var Models = require('./lib/models.js');
 
 var Channel = require('./lib/channel.js');
 
-var config = require('./config.js').irc;
-
 var commands = require('./lib/commands');
 
 var models = require('./lib/models.js');
@@ -92,7 +90,7 @@ c.onChat = function (channel, user, message, self) {
     channel.users[user] = user;
     channel.onMessage(user, message);
     //Update the Last Seen table...
-    client.updateLastSeen(user.username, channel.model.name);
+    client.updateLastSeen(user.username, channel.model.name, message);
 };
 
 c.onMod = function (channel, user) {
@@ -155,15 +153,27 @@ c.onWhisper = function (from, user, message, fromSelf) {
  
 }
 
-c.updateLastSeen = function (user, channelName) {
-    models.LastSeen.findOrCreate({ where: { name: user }, defaults: { dateTimeSeen: Date.now() } }).spread(function (foundUser) {
-        foundUser.dateTimeSeen = Date.now();
+c.updateLastSeen = function (user, channelName, message) {
+    models.LastSeen.findOrCreate({ where: { name: user }, defaults: { dateTimeSeen: Date.now() } }).spread(function (foundUser, created) {
+		if (created) {
+			var RegEx = new RegExp("(\b(https?|ftp|file)://)?[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|](\b(https?|ftp|file)://)?[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
+			if (RegEx.test(message)) {
+				if (client.isMod(channelName, settings.user_name)) {
+					log.info("New user (" + user + ") appeared in " + channelName + " and sent a URL. SpamBot? Timing out for 5 minutes");
+					client.timeout(channelName, user, 300, "<AUTOMATED> First time seen and posting a URL - Spambot?");
+					client.say(channelName, "Automated timeout for " + user + " - First time I see you and your're posting a URL? Wait 5 minutes and try again.");
+					foundUser.destroy();
+					return;
+				}
+			}
+		}
+		foundUser.dateTimeSeen = Date.now();
 		if (channelName) {
 			foundUser.whereSeen = channelName;
 		} else {
 			foundUser.whereSeen = null;
 		}
-        foundUser.save();
+		foundUser.save();
     });
 }
 

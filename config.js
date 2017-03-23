@@ -10,6 +10,9 @@ module.exports = {
 		//How long we keep an users mod status after twitch revokes it
 		//(Twitch grants and revokes mod status all the time)
 		modTimeout: 30 * 60 * 60 * 1000,
+
+		//The command prefix that the bot listens for. For dev versions, this is "\". You should probably change this to "!" unless you have another bot using that.
+		commandPrefix: '\\'
 	},
 
 	twitchAPI: {
