@@ -132,7 +132,10 @@ c.onChatNotice = function (channel, msgid, message) {
 			log.warn("Restricted whisper message. Channel ", channel, ", id ", msgid, ", message ", message);
 			this.parent.replayWhisper(true);
 			break;
-		default:
+        case "msg_banned":
+            log.warn("We are banned from ", channel, ", apparently. Leaving.");
+            this.part(channel);
+        default:
             log.info(this.network,"Chat connection notice: ", channel, " - ", msgid, " (", message, ")");
             break;
     }

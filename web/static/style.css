@@ -15,17 +15,18 @@ a.live_channel {
 	display: block;
 	float: left;
 	margin: 15px;
-	padding: 5px;
-	width: 640px;
+	padding: 0px;
+	width: 641px;
 	border: 2px outset #aaaaaa;
 	box-shadow: 2px 2px 6px #000000;
 	border-radius: 10px;
-	min-height: 300px;
+	height: 460px;
+	position: relative;
 }
 a.live_channel h3.live_header {
 	padding: 5px 0;
 	margin: 0;
-	margin-bottom: 0px;
+	height: 1em;
 	text-align: center;
 	background-color: black;
 	color: white;
@@ -33,12 +34,12 @@ a.live_channel h3.live_header {
 	margin-left: -5px;
 	width: 650px;
 	border-radius: 10px 10px 0 0;
+	margin-bottom: 1px;
 }
 a.live_channel img.channel_logo {
-	position: relative;
-	top: -34px;
+	position: absolute;
+	top: -5px;
 	left: -5px;
-	margin-bottom: -145px;
     filter: drop-shadow(7px 7px 7px black);
 	width: 150px;
 	height: 150px;
@@ -48,10 +49,17 @@ a.live_channel img.live_picture {
 	margin: auto;
 	width: 640px;
 	height: 360px;
-    margin-top: -9px;
+    margin-top: 0;
 }
 a.live_channel div.live_game {
 	text-align: center;
+	margin: auto;
+	margin-top: auto;
+	margin-bottom: 0;
+	display: block;
+	position: absolute;
+	width: 100%;
+	bottom: 0px;
 }
 
 header {

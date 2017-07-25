@@ -7,8 +7,34 @@
 	var request;
 
 	var title = document.title;
+	var firstRun = true;
 
+	var notified = [];
+	var previousChannels = [];
 	var mainContainer = document.getElementById('live_streams');
+	var doNotification = function (channel) { console.log("No notification for you!"); };
+	var actualNotif = function (channel) {
+		if (Notification) {
+			var twitchChannel = twitchStreams[channel];
+			var options = {
+				body: "Channel " + channel + " is now live playing " + (twitchChannel.channel.game || "Something") + " (" + twitchChannel.channel.status + ")",
+				icon: twitchChannel.channel.logo
+			}
+			var notification = new Notification("Ghost of Leg Bot", options);
+			setTimeout(notification.close.bind(notification), 5000);
+		}
+	}
+	if (Notification) {
+		if (Notification.permission === "granted") {
+			doNotification = actualNotif;
+		} else if (Notification.permission !== "denied") {
+			Notification.requestPermission(function (permission) {
+				if (permission === "granted") {
+					doNotification = actualNotif;
+				}
+			});
+		}
+	}
 
 	function requestData(){
 		if(request && request.readyState < 4){
@@ -28,6 +54,7 @@
 
 		twitchStreams = JSON.parse(request.response);
 		buildDivs();
+		firstRun = false;
 	}
 
 	function buildDivs(){
@@ -41,6 +68,26 @@
 		channels = channels.sort();
 
 		channels.forEach(buildDiv);
+		var newChannels = [];
+		var removedChannels = [];
+		for (let channel of channels) {
+			console.log("Checking if " + channel + " is new...", !previousChannels.includes(channel));
+			if (!previousChannels.includes(channel)) {
+				console.log("It is! Is this first run?", firstRun);
+				newChannels.push(channel);
+				if (!firstRun) {
+					console.log("Trying notification for " + channel);
+					doNotification(channel);
+				}
+			}
+		};
+		for (let channelName of previousChannels) {
+			if (!channels.includes(channelName)) {
+				removedChannels.push(channelName);
+			}
+		};
+		previousChannels = channels;
+		
 	}
 
 	function buildDiv(channel){
@@ -73,7 +120,9 @@
 		var game = document.createElement('div');
 		game.classList.add('live_game');
 		channel = channel.channel || channel;
-		game.innerHTML = "Playing: " + (channel.game || "Something?");
+		game.innerHTML = "";
+		if (channel.status) game.innerHTML += channel.status + "<hr />"
+		game.innerHTML += "Playing: " + (channel.game || "Something?");
 
 		container.appendChild(header);
 		container.appendChild(logo);
