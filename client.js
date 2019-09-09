@@ -82,6 +82,7 @@ c.onRoomState = function (channel, state) {
 c.onChat = function (channel, user, message, self) {
 	if (self) {
 		//We don't care what we said.
+		this.parent.channels[channel].amMod = user.mod;
 		return;
 	}
 	var channel = this.parent.channels[channel];
@@ -165,6 +166,10 @@ c.onWhisper = function (from, user, message, fromSelf) {
 
 }
 
+c.getUsername = function() {
+	return this.clientConnection.getUsername();
+}
+
 c.updateLastSeen = function (user, channelName, message) {
 	models.LastSeen.findOrCreate({
 		where: {
@@ -177,10 +182,10 @@ c.updateLastSeen = function (user, channelName, message) {
 		if (created) {
 			var RegEx = new RegExp("(\b(https?|ftp|file)://)?[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|](\b(https?|ftp|file)://)?[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
 			if (RegEx.test(message)) {
-				if (client.isMod(channelName, settings.user_name)) {
-					log.info("New user (" + user + ") appeared in " + channelName + " and sent a URL. SpamBot? Timing out for 5 minutes");
-					client.timeout(channelName, user, 300, "<AUTOMATED> First time seen and posting a URL - Spambot?");
-					client.say(channelName, "Automated timeout for " + user + " - First time I see you and your're posting a URL? Wait 5 minutes and try again.");
+				if (this.parent.channels[channelName].amMod) {
+					log.info(`New user (${user}) appeared in ${channelName} and sent a URL (${message}). SpamBot? Timing out for 5 minutes`);
+					//client.timeout(channelName, user, 300, "<AUTOMATED> First time seen and posting a URL - Spambot?");
+					//client.say(channelName, "Automated timeout for " + user + " - First time I see you and your're posting a URL? Wait 5 minutes and try again.");
 					foundUser.destroy();
 					return;
 				}
