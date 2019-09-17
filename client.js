@@ -178,15 +178,25 @@ c.updateLastSeen = function (user, channelName, message) {
 		defaults: {
 			dateTimeSeen: Date.now()
 		}
-	}).spread(function (foundUser, created) {
+	}).spread((foundUser, created) => {
 		if (created) {
-			var RegEx = new RegExp("(\b(https?|ftp|file)://)?[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|](\b(https?|ftp|file)://)?[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
+			var RegEx = new RegExp("[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)");
 			if (RegEx.test(message)) {
-				if (this.parent.channels[channelName].amMod) {
-					log.info(`New user (${user}) appeared in ${channelName} and sent a URL (${message}). SpamBot? Timing out for 5 minutes`);
-					//client.timeout(channelName, user, 300, "<AUTOMATED> First time seen and posting a URL - Spambot?");
-					//client.say(channelName, "Automated timeout for " + user + " - First time I see you and your're posting a URL? Wait 5 minutes and try again.");
+				let channels;
+				if (this.channels) channels = this.channels;
+				if (!channels && this.parent.channels) channels = this.parent.channels;
+				if (!channels) {
+					log.warn(`Problem finding channels, this = ${JSON.stringify(this)}`);
+					return;
+				}
+				if (channels["#" + channelName].amMod) {
+					log.warn(`New user (${user}) appeared in ${channelName} and sent a URL (${message}). SpamBot? Timing out for 5 minutes`);
+					client.timeout("#" + channelName, user, 300, "<AUTOMATED> First time seen and posting a URL - Spambot?");
+					client.say("#" + channelName, "Automated timeout for " + user + " - First time I see you and your're posting a URL? Wait 5 minutes and try again.");
 					foundUser.destroy();
+					return;
+				} else {
+					log.warn(`New user (${user}) appeared in ${channelName} and sent a URL (${message}), but we're not a mod. Ignoring.`);
 					return;
 				}
 			}
