@@ -166,7 +166,8 @@ moment().format();
 			this.updateValues(channel);
 			this.htmlCreated = false;
 		}
-		updateValues() {
+		updateValues(channel) {
+			this.channel = channel;
 			this.name = this.channel.channel.display_name;
 			this.URL = this.channel.channel.url;
 			this.logo = this.channel.channel.logo;
