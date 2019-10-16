@@ -32,9 +32,18 @@ var ircClient = function () {
 
 	//We store Channel objects that we pass messages to
 	this.channels = {};
-	this.seenCache = Map();
+	this.seenCache = new Map();
 
 	twitch.client = this;
+	
+	// Every minute, clear out any seen entries not used in the last 10 minutes.
+	this.clearCache = setInterval(() => {
+		this.seenCache.forEach((value, key, map) => {
+			if (value.dateTimeSeen < (Date.now() + (10*60*1000))) {
+				map.delete(key);
+			}
+		});
+	}, (60*1000));
 }
 
 var c = ircClient.prototype;
@@ -172,27 +181,26 @@ c.getUsername = function() {
 }
 
 c.getUserSeen = async function(user) {
-	return new Promise((resolve, reject) => {
-		if (this.seenCache.has(user)) {
-			resolve(this.seenCache.get(user));
-		} else {
-			try {
-				const foundUser = await models.LastSeen.findOne({
-					where: {
-						name: user
-					}
-				});
-				if (foundUser) {
-					this.seenCache.set(user, foundUser.id);
-					resolve(foundUser.id);
-				} else {
-					reject(new Error(`Unable to find LastSeens.id for user ${user}`));
+	if (this.seenCache.has(user)) {
+		this.seenCache.get(user).dateTimeSeen = Date.now();
+		return this.seenCache.get(user).id;
+	} else {
+		try {
+			const foundUser = await models.LastSeen.findOne({
+				where: {
+					name: user
 				}
-			} catch(e) {
+			});
+			if (foundUser) {
+				this.seenCache.set(user, { id: foundUser.id, dateTimeSeen: Date.now() });
+				return foundUser.id;
+			} else {
 				reject(new Error(`Unable to find LastSeens.id for user ${user}`));
 			}
+		} catch(e) {
+			reject(new Error(`Unable to find LastSeens.id for user ${user}`));
 		}
-	});
+	}
 }
 
 c.updateLastSeen = function (user, channelName, message) {
