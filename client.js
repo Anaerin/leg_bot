@@ -32,6 +32,7 @@ var ircClient = function () {
 
 	//We store Channel objects that we pass messages to
 	this.channels = {};
+	this.seenCache = Map();
 
 	twitch.client = this;
 }
@@ -170,7 +171,72 @@ c.getUsername = function() {
 	return this.clientConnection.getUsername();
 }
 
+c.getUserSeen = async function(user) {
+	return new Promise((resolve, reject) => {
+		if (this.seenCache.has(user)) {
+			resolve(this.seenCache.get(user));
+		} else {
+			try {
+				const foundUser = await models.LastSeen.findOne({
+					where: {
+						name: user
+					}
+				});
+				if (foundUser) {
+					this.seenCache.set(user, foundUser.id);
+					resolve(foundUser.id);
+				} else {
+					reject(new Error(`Unable to find LastSeens.id for user ${user}`));
+				}
+			} catch(e) {
+				reject(new Error(`Unable to find LastSeens.id for user ${user}`));
+			}
+		}
+	});
+}
+
 c.updateLastSeen = function (user, channelName, message) {
+	this.getUserSeen(user).then((userID) => {
+		models.LastSeen.update({
+			dateTimeSeen: Date.now(),
+			whereSeen: channelName?channelName:null
+		}, {
+			where: {
+				id: userID
+			}
+		});
+	}).catch((e) => {
+		var RegEx = new RegExp("[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)");
+		if (RegEx.test(message)) {
+			let channels;
+			if (this.channels) channels = this.channels;
+			if (!channels && this.parent.channels) channels = this.parent.channels;
+			if (!channels) {
+				log.warn(`Problem finding channels, this = ${JSON.stringify(this)}`);
+				return;
+			}
+			if (channels["#" + channelName].amMod) {
+				log.warn(`New user (${user}) appeared in ${channelName} and sent a URL (${message}). SpamBot? Timing out for 5 minutes`);
+				client.timeout("#" + channelName, user, 300, "<AUTOMATED> First time seen and posting a URL - Spambot?");
+				client.say("#" + channelName, "Automated timeout for " + user + " - First time I see you and your're posting a URL? Wait 5 minutes and try again.");
+				foundUser.destroy();
+				return;
+			} else {
+				log.warn(`New user (${user}) appeared in ${channelName} and sent a URL (${message}), but we're not a mod. Ignoring.`);
+				return;
+			}
+		}
+		models.LastSeen.build({
+			name: user,
+			dateTimeSeen: Date.now(),
+			whereSeen: channelName?channelName:null
+		}).save().then((savedUser) => {
+			this.seenCache.set(user, savedUser.id);
+		});
+	});
+	/* 
+	// Old version, just in case.
+
 	models.LastSeen.findOrCreate({
 		where: {
 			name: user
@@ -180,26 +246,7 @@ c.updateLastSeen = function (user, channelName, message) {
 		}
 	}).spread((foundUser, created) => {
 		if (created) {
-			var RegEx = new RegExp("[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)");
-			if (RegEx.test(message)) {
-				let channels;
-				if (this.channels) channels = this.channels;
-				if (!channels && this.parent.channels) channels = this.parent.channels;
-				if (!channels) {
-					log.warn(`Problem finding channels, this = ${JSON.stringify(this)}`);
-					return;
-				}
-				if (channels["#" + channelName].amMod) {
-					log.warn(`New user (${user}) appeared in ${channelName} and sent a URL (${message}). SpamBot? Timing out for 5 minutes`);
-					client.timeout("#" + channelName, user, 300, "<AUTOMATED> First time seen and posting a URL - Spambot?");
-					client.say("#" + channelName, "Automated timeout for " + user + " - First time I see you and your're posting a URL? Wait 5 minutes and try again.");
-					foundUser.destroy();
-					return;
-				} else {
-					log.warn(`New user (${user}) appeared in ${channelName} and sent a URL (${message}), but we're not a mod. Ignoring.`);
-					return;
-				}
-			}
+
 		}
 		foundUser.dateTimeSeen = Date.now();
 		if (channelName) {
@@ -209,6 +256,7 @@ c.updateLastSeen = function (user, channelName, message) {
 		}
 		foundUser.save();
 	});
+	*/
 }
 
 

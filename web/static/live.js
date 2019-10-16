@@ -112,6 +112,7 @@ moment().format();
 		firstRun = false;
 		timeToUpdate = 90;
 		updateCountdown();
+		twitchHealthWarning(twitchStreams.twitchHealthy);
 	}
 
 	function escapeHtml(text) {
@@ -126,6 +127,22 @@ moment().format();
 		return text.replace(/[&<>"']/g, function (m) { return map[m]; });
 	}	
 	
+	function twitchHealthWarning(twitchHealthy) {
+		if (twitchHealthy && document.getElementById("HealthWarning")) {
+			document.getElementById("HealthWarning").parentElement.removeChild(document.getElementById("HealthWarning"));
+			window.badTime = false;
+		}
+		if (!twitchHealthy && !document.getElementById("HealthWarning")) {
+			let healthWarning = document.createElement("div");
+			healthWarning.id = "HealthWarning";
+			healthWarning.innerHTML = 'Twitch is currently returning invalid data. Data shown here may be out of date.<br /><span id="badSince">This is the first time there\'s been an issue.</span>';
+			document.getElementById('live_streams').insertBefore(healthWarning, document.getElementById("liveContainer"));
+			window.badTime = Date.now();
+		} else if (!twitchHealthy) {
+			document.getElementById("badSince").innerHTML = `Twitch has been returning bad data for the past ${moment(window.badTime).fromNow(true)}`;
+		}
+	}
+
 	function buildComingUp(events) {
 		if (events) {
 			let returnVal = document.createDocumentFragment();

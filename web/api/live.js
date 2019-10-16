@@ -17,7 +17,8 @@ module.exports = function(app){
 		var out = {
 			lrrEvents: lrrEvents,
 			fanEvents: fanEvents,
-			Twitch: twitch.getData()
+			Twitch: twitch.getData(),
+			twitchHealthy: twitch.twitchHealthy
 		};
 		res.send(JSON.stringify(out));
 	});
