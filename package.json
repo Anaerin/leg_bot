@@ -27,12 +27,13 @@
     "moment-timezone": "^0.5.4",
     "request": "^2.74.0",
     "roll": "^1.2.0",
-    "sequelize": "^3.23.4",
+    "sequelize": "^5",
     "serve-static": "^1.11.1",
     "sqlite3": "^3.1.13",
     "tmi.js": "^1.1.1",
     "winston": "^2.2.0",
     "winston-child": "^1.0.0",
-    "winston-daily-rotate-file": "^1.1.4"
+	"winston-daily-rotate-file": "^1.1.4",
+	"mysql2": "^1.7.0"
   }
 }
