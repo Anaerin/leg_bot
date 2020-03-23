@@ -65,6 +65,10 @@ c.connect = function (options) {
 	this.clientConnection.on('notice', this.onChatNotice);
 	this.clientConnection.on('roomstate', this.onRoomState);
 	this.clientConnection.on('whisper', this.onWhisper);
+	this.clientConnection.on('error', (e) => {
+		// Unknown if this is actually a thing or not, it's not mentioned in the documentation.
+		log.error("CONNECTION ERROR: %s", e);
+	});
 	//this.clientConnection.on('serverchange', this.onServerChange);
 	this.clientConnection.network = "Main";
 	this.clientConnection.connect();
@@ -116,6 +120,10 @@ c.onUnMod = function (channel, user) {
 c.onChatDisconnect = function (reason) {
 	client.clientConnected = false;
 	log.warn(this.network, "Chat channel disconnected: ", reason);
+	this.parent.channels.forEach((channel) => {
+		channel.tearDown();
+		delete channel;
+	});
 	if (this.parent.quitting /* && !whisperconnConnected */ ) {
 		process.exit();
 	}
@@ -150,11 +158,13 @@ c.onChatNotice = function (channel, msgid, message) {
 			this.part(channel);
 			this.parent.channels[channel].model.active = false;
 			this.parent.channels[channel].model.save();
+			this.parent.channels[channel].tearDown();
 		case "msg_channel_suspended":
 			log.warn("Channel %s is suspended. Leaving.", channel);
 			this.part(channel);
 			this.parent.channels[channel].model.active = false;
 			this.parent.channels[channel].model.save();
+			this.parent.channels[channel].tearDown();
 		default:
 			log.info(this.network, "Chat connection notice: ", channel, " - ", msgid, " (", message, ")");
 			break;

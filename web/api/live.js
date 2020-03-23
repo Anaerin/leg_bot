@@ -18,7 +18,8 @@ module.exports = function(app){
 			lrrEvents: lrrEvents,
 			fanEvents: fanEvents,
 			Twitch: twitch.getData(),
-			twitchHealthy: twitch.twitchHealthy
+			twitchHealthy: twitch.twitchHealthy,
+			following: twitch.following
 		};
 		res.send(JSON.stringify(out));
 	});
